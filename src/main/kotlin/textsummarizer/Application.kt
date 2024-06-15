@@ -9,9 +9,11 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
-    configureDatabases()
     configureMonitoring()
-    configureHTTP()
-    configureSecurity()
+    //configureHTTP()
+    //configureSecurity()
+
+    DatabaseFactory.db
+
     configureRouting()
 }

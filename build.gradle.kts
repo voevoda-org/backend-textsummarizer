@@ -1,8 +1,9 @@
-
 val kotlin_version: String by project
 val logback_version: String by project
 val exposed_version: String by project
 val h2_version: String by project
+val ktorm_version: String by project
+val postgres_version: String by project
 
 plugins {
     kotlin("jvm") version "2.0.0"
@@ -42,6 +43,17 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml")
+
+    // client
+    implementation("io.ktor:ktor-client-core")
+    implementation("io.ktor:ktor-client-cio")
+
+    // database
+    implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")
+    implementation("org.postgresql:postgresql:$postgres_version")
+    implementation("org.ktorm:ktorm-core:$ktorm_version")
+    implementation("org.apache.commons:commons-dbcp2:2.9.0")
+
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
