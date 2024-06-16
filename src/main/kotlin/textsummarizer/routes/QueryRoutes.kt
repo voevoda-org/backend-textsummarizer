@@ -6,6 +6,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
 import textsummarizer.services.QueryService
+import java.util.*
 
 private val service = QueryService()
 
@@ -13,8 +14,11 @@ fun Route.queriesRoute() {
     route("/v1/queries/") {
         post {
             val queryDto = call.receive<QueryDto>()
+            val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
+                ?: throw IllegalArgumentException("DeviceId header is missing")
+
             runBlocking {
-                call.respond(service.query(queryDto.queryText))
+                call.respond(service.query(queryDto.queryText, deviceId))
             }
         }
 

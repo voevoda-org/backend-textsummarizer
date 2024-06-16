@@ -4,6 +4,7 @@ import com.typesafe.config.ConfigFactory
 import io.ktor.server.config.*
 import org.apache.commons.dbcp2.BasicDataSource
 import org.ktorm.database.Database
+import org.slf4j.LoggerFactory
 
 /**
  * Database connection object.
@@ -12,13 +13,17 @@ import org.ktorm.database.Database
  */
 object DatabaseFactory {
 
+    private val logger = LoggerFactory.getLogger("DatabaseFactory")
+
     private val config = HoconApplicationConfig(ConfigFactory.load())
 
     val db: Database
 
     init {
+        logger.info("Initializing Database")
         val dataSource = setupDataSource()
         db = Database.connect(dataSource)
+        logger.info("Database connected")
     }
 
     private fun setupDataSource(): BasicDataSource {

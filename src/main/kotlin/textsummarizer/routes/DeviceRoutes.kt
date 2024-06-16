@@ -5,7 +5,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import textsummarizer.models.Device
 import textsummarizer.services.DeviceService
-import java.util.UUID
+import java.time.LocalDateTime
+import java.util.*
 
 private val service = DeviceService()
 
@@ -15,8 +16,13 @@ fun Route.devicesRoute() {
             val id = UUID.fromString(call.parameters["id"])
 
             id?.let {
-                service.save(Device { this.id = id })
-                    .also { call.respond(HttpStatusCode.Created, id) }
+                service.save(
+                    Device {
+                        this.id = UUID.randomUUID()
+                        createdAt = LocalDateTime.now()
+                    }
+                )
+                    .also { call.respond(HttpStatusCode.Created, id.toString()) }
             } ?: call.respond(HttpStatusCode.BadRequest)
         }
     }

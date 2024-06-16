@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="0" author="christopher werner">
+        <createTable tableName="devices">
+            <column name="id" type="uuid" autoIncrement="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE NOT NULL"/>
+        </createTable>
+
+        <createTable tableName="queries">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
+            </column>
+            <column name="query" type="NVARCHAR(10000) NOT NULL"/>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE NOT NULL"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

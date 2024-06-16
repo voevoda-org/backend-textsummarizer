@@ -1,4 +1,4 @@
-package textsummarizer.routes.dto
+package textsummarizer.models.dto
 
 import kotlinx.serialization.Serializable
 

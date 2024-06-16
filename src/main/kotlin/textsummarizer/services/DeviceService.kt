@@ -8,9 +8,10 @@ import textsummarizer.models.Device
 import textsummarizer.models.devices
 import textsummarizer.plugins.DatabaseFactory.db
 
-class DeviceService {
+private val logger = LoggerFactory.getLogger("DeviceService")
 
-    private val logger = LoggerFactory.getLogger("DeviceService")
+
+class DeviceService {
 
     suspend fun save(device: Device): Unit = withContext(Dispatchers.IO) {
         this.runCatching {
