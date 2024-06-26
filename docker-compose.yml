@@ -1,4 +1,20 @@
 services:
+  textsummarizer:
+    image: ceroxlol/textsummarizer-backend
+    container_name: textsummarizer-backend
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      DB_URL: jdbc:postgresql://db:5432/textsummarizer_api_dev
+      DB_USERNAME: postgres
+      DB_PASSWORD: 9$MwQr5Lj!9Jis
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - textsummarizer_api_net
   db:
     image: postgres
     container_name: textsummarizer_api_db
@@ -6,11 +22,20 @@ services:
     environment:
       POSTGRES_DB: textsummarizer_api_dev
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: test1234
+      POSTGRES_PASSWORD: 9$MwQr5Lj
     volumes:
       - db:/data/postgres
     ports:
       - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
+    networks:
+      - textsummarizer_api_net
 
 volumes:
   db:
+
+networks:
+  textsummarizer_api_net:
+    driver: bridge

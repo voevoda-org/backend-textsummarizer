@@ -55,6 +55,7 @@ dependencies {
     // client
     implementation("io.ktor:ktor-client-core")
     implementation("io.ktor:ktor-client-cio")
+    implementation("io.ktor:ktor-client-content-negotiation-jvm")
 
     // database
     implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")

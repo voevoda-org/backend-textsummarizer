@@ -1,11 +1,9 @@
 package textsummarizer.services
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.server.plugins.*
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.server.plugins.NotFoundException
 import org.ktorm.dsl.eq
 import org.ktorm.entity.add
 import org.ktorm.entity.find
@@ -15,23 +13,20 @@ import textsummarizer.models.Query
 import textsummarizer.models.devices
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
+import textsummarizer.utils.HttpClient.openApiClient
 import java.time.LocalDateTime
 import java.util.*
 
-private const val aws_lambda_url = "MOCK"
+private const val authUrl = "/models"
+private const val queryUrl = "/chat/completions"
 
 class QueryService {
 
     private val logger = LoggerFactory.getLogger("QueryService")
-    private val client = HttpClient(CIO)
 
     suspend fun query(body: String, deviceId: UUID): String {
         logger.info("Calling AWS Lambda with $body")
-        val result = client.post(aws_lambda_url) {
-            headers {
-                append(HttpHeaders.ContentType, ContentType.Application.Json)
-                append(HttpHeaders.Authorization, "Bearer token")
-            }
+        val result = openApiClient.post(queryUrl) {
             setBody(body)
         }
             .bodyAsText()

@@ -1,6 +1,7 @@
 package textsummarizer.plugins
 
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import textsummarizer.routes.devicesRoute
@@ -12,8 +13,10 @@ fun Application.configureRouting() {
             get("/v1/test") {
                 call.respond("Hello World!")
             }
-            devicesRoute()
-            queriesRoute()
+            authenticate("auth-jwt") {
+                devicesRoute()
+                queriesRoute()
+            }
         }
     }
 }

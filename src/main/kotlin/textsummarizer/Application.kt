@@ -11,7 +11,7 @@ fun Application.module() {
     configureSerialization()
     configureMonitoring()
     //configureHTTP()
-    //configureSecurity()
+    configureSecurity()
 
     DatabaseFactory.db
 
