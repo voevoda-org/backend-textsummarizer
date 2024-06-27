@@ -5,10 +5,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
-import textsummarizer.services.QueryService
+import textsummarizer.services.ChatGptService
 import java.util.*
 
-private val service = QueryService()
+private val service = ChatGptService()
 
 fun Route.queriesRoute() {
     route("/v1/queries/") {

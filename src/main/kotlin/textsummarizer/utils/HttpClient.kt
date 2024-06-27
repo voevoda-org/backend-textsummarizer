@@ -30,6 +30,7 @@ object HttpClient {
         defaultRequest {
             host = "https://api.openai.com/v1"
             header(HttpHeaders.Authorization, "Bearer ${config.property("chatGpt.authKey")}")
+            header("Content-Type","application/json")
         }
     }
 }
