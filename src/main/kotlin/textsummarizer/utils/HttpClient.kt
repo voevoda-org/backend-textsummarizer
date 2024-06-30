@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 object HttpClient {
     private val config = HoconApplicationConfig(ConfigFactory.load())
 
+    private val chatGptAuthKey = config.property("chatGpt.authKey").getString()
     val openApiClient: HttpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
@@ -28,8 +29,8 @@ object HttpClient {
         }
         
         defaultRequest {
-            host = "https://api.openai.com/v1"
-            header(HttpHeaders.Authorization, "Bearer ${config.property("chatGpt.authKey")}")
+            //host = "api.openai.com/v1"
+            header(HttpHeaders.Authorization, "Bearer $chatGptAuthKey")
             header("Content-Type","application/json")
         }
     }

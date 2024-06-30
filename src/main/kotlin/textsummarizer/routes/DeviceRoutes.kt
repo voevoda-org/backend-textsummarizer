@@ -11,15 +11,15 @@ import java.util.*
 private val service = DeviceService()
 
 fun Route.devicesRoute() {
-    route("/v1/devices/{id}") {
-        post {
+    route("/devices") {
+        post("/{id}") {
             val id = UUID.fromString(call.parameters["id"])
 
             id?.let {
                 service.save(
                     Device {
-                        this.id = UUID.randomUUID()
-                        createdAt = LocalDateTime.now()
+                        this.id = id
+                        this.createdAt = LocalDateTime.now()
                     }
                 )
                     .also { call.respond(HttpStatusCode.Created, id.toString()) }
