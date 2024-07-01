@@ -18,7 +18,7 @@ fun Route.loginRoutes(){
         val mobileSecret = call.receiveText()
         if (mobileSecret != environment.config.property("mobile.password").getString()) {
             return@post call.respond(
-                HttpStatusCode.Unauthorized
+                HttpStatusCode.BadRequest
             )
         }
 

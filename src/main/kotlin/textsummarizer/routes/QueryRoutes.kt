@@ -16,7 +16,7 @@ fun Route.queriesRoute() {
         post {
             val mobileQueryDto = call.receive<MobileQueryDto>()
             val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
-                ?: throw IllegalArgumentException("DeviceId header is missing")
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId")
 
             runBlocking {
                 call.respond(chatGptService.query(mobileQueryDto, deviceId))

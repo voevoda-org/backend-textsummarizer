@@ -3,56 +3,41 @@ info:
   title: "textsummarizer_backend_textsummarizer API"
   description: "textsummarizer_backend_textsummarizer API"
   version: "1.0.0"
+  contact:
+    email: "christopher.werner1@gmx.net"
+    name: "Christopher Werner"
 servers:
+  - url: localhost:8080
+    description: local
   - url: "http://voevoda.cvwerner.de"
+    description: prod
 paths:
-  /api/v1/devices/{id}:
-    post:
-      description: ""
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "string"
-      responses:
-        "201":
-          description: "Created"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-        "400":
-          description: "Bad Request"
-          content:
-            '*/*':
-              schema:
-                type: "object"
   /api/v1/login:
     post:
-      description: ""
+      description: "Takes the mobile_secret and returns a JWT token upon correct secret"
       responses:
-        "401":
-          description: "Unauthorized"
+        "400":
+          description: "Wrong password"
           content:
-            '*/*':
+            'text/plain':
               schema:
-                type: "object"
+                type: string
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/HashMap_String"
+                $ref: "#/components/schemas/Login"
   /api/v1/queries:
     post:
-      description: ""
+      description: "Used to process a query to an AI model"
       parameters:
         - name: "deviceId"
           in: "header"
-          required: false
+          required: true
           schema:
             type: "string"
+            description: "UUID to identify the device which the request is coming from"
       requestBody:
         content:
           application/json:
@@ -63,9 +48,15 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ChatGptResponse"
+        "400":
+          description: "Missing deviceId header"
+          content:
+            'text/plain':
+              schema:
+                type: string
   /api/v1/queries/{id}:
     get:
       description: ""
@@ -79,9 +70,9 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
-                $ref: "#/components/schemas/Object"
+                $ref: "#/components/schemas/ChatGptResponse"
         "404":
           description: "Not Found"
           content:
@@ -99,12 +90,12 @@ paths:
                   value: "Invalid id"
   /api/v1/test:
     get:
-      description: ""
+      description: "Endpoint for testing if the application is up and running :)"
       responses:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'text/plain':
               schema:
                 type: "string"
               examples:
@@ -112,11 +103,6 @@ paths:
                   value: "Hello World!"
 components:
   schemas:
-    HashMap:
-      type: "object"
-      properties: { }
-    HashMap_String:
-      type: "string"
     MobileQueryDto:
       type: "object"
       properties:
@@ -135,6 +121,8 @@ components:
     ChatGptResponse:
       type: "object"
       properties: { }
-    Object:
+    Login:
       type: "object"
-      properties: { }
+      properties:
+        token:
+          type: "string"
