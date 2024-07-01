@@ -12,29 +12,29 @@ import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
 fun Application.configureHTTP() {
-    install(SimpleCache) {
-        redisCache {
-            invalidateAt = 10.seconds
-            host = "localhost"
-            port = 6379
-        }
-    }
+//    install(SimpleCache) {
+//        redisCache {
+//            invalidateAt = 10.seconds
+//            host = "localhost"
+//            port = 6379
+//        }
+//    }
     routing {
         swaggerUI(path = "openapi")
     }
-    routing {
-        openAPI(path = "openapi")
-    }
-    routing {
-        cacheOutput(2.seconds) {
-            get("/short") {
-                call.respond(Random.nextInt().toString())
-            }
-        }
-        cacheOutput {
-            get("/default") {
-                call.respond(Random.nextInt().toString())
-            }
-        }
-    }
+//    routing {
+//        openAPI(path = "openapi")
+//    }
+//    routing {
+//        cacheOutput(2.seconds) {
+//            get("/short") {
+//                call.respond(Random.nextInt().toString())
+//            }
+//        }
+//        cacheOutput {
+//            get("/default") {
+//                call.respond(Random.nextInt().toString())
+//            }
+//        }
+//    }
 }

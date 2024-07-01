@@ -10,7 +10,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureSerialization()
     configureMonitoring()
-    //configureHTTP()
+    configureHTTP()
     configureSecurity()
 
     DatabaseFactory.db

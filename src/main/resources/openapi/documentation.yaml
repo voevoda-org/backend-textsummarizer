@@ -1,23 +1,140 @@
-openapi: "3.0.3"
+openapi: "3.0.0"
 info:
-  title: "Application API"
-  description: "Application API"
+  title: "textsummarizer_backend_textsummarizer API"
+  description: "textsummarizer_backend_textsummarizer API"
   version: "1.0.0"
 servers:
-  - url: "http://0.0.0.0:8080"
+  - url: "http://voevoda.cvwerner.de"
 paths:
-  /:
-    get:
-      description: "Hello World!"
+  /api/v1/devices/{id}:
+    post:
+      description: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "201":
+          description: "Created"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+  /api/v1/login:
+    post:
+      description: ""
+      responses:
+        "401":
+          description: "Unauthorized"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HashMap_String"
+  /api/v1/queries:
+    post:
+      description: ""
+      parameters:
+        - name: "deviceId"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MobileQueryDto"
+        required: true
       responses:
         "200":
           description: "OK"
           content:
-            text/plain:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ChatGptResponse"
+  /api/v1/queries/{id}:
+    get:
+      description: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Object"
+        "404":
+          description: "Not Found"
+          content:
+            '*/*':
+              schema:
+                type: "object"
+        "400":
+          description: "Bad Request"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid id"
+  /api/v1/test:
+    get:
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
               schema:
                 type: "string"
               examples:
                 Example#1:
                   value: "Hello World!"
 components:
-  schemas: {}
+  schemas:
+    HashMap:
+      type: "object"
+      properties: { }
+    HashMap_String:
+      type: "string"
+    MobileQueryDto:
+      type: "object"
+      properties:
+        queryText:
+          type: "string"
+        queryType:
+          type: "string"
+          enum:
+            - "SUMMARIZE"
+            - "ESSAY"
+            - "QUESTION"
+            - "TRANSLATE"
+      required:
+        - "queryText"
+        - "queryType"
+    ChatGptResponse:
+      type: "object"
+      properties: { }
+    Object:
+      type: "object"
+      properties: { }
