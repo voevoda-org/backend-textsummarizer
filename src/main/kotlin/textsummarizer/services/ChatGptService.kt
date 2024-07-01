@@ -4,8 +4,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.server.plugins.NotFoundException
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.Json.Default.decodeFromString
 import org.ktorm.dsl.eq
 import org.ktorm.entity.add
@@ -34,7 +32,6 @@ import textsummarizer.utils.HttpClient.openApiClient
 import java.time.LocalDateTime
 import java.util.*
 
-//private const val queryUrl = "/chat/completions"
 private const val queryUrl = "https://api.openai.com/v1/chat/completions"
 
 class ChatGptService {
@@ -48,6 +45,9 @@ class ChatGptService {
             setBody(queryOutputDto)
         }
             .body<QueryInputDto>()
+            .also {
+                logger.info("Received $this")
+            }
             .toQueryInputDomainModel()
             .let {
                 //Json.decodeFromString<ChatGptResponse>(it.choices[0].message.content)
@@ -58,17 +58,14 @@ class ChatGptService {
                     QueryType.TRANSLATE -> decodeFromString(TranslationResult.serializer(), it.choices[0].message.content)
                 }
             }
-            .also {
+            .also { chatGptResponse ->
                 persistToDatabase(
                     queryText = mobileQueryDto.queryText,
-                    response = it.toResponse(),
+                    response = chatGptResponse.toText(),
                     deviceId = deviceId
                 )
-                logger.info("OpenApi response: $it")
+                logger.info("OpenApi response: $chatGptResponse")
             }
-//            .let { json ->
-//                Json.decodeFromString(json)
-//            }
     }
 
     private fun persistToDatabase(queryText: String, response: String, deviceId: UUID) {
