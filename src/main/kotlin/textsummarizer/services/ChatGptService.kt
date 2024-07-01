@@ -36,7 +36,7 @@ private const val queryUrl = "https://api.openai.com/v1/chat/completions"
 
 class ChatGptService {
 
-    private val logger = LoggerFactory.getLogger("QueryService")
+    private val logger = LoggerFactory.getLogger("ChatGptService")
 
     suspend fun query(mobileQueryDto: MobileQueryDto, deviceId: UUID): ChatGptResponse {
         val queryOutputDto = mobileQueryDto.createQueryContent().toQueryOutputDto()
