@@ -1,6 +1,6 @@
 import java.util.*
 
-
+val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 val exposed_version: String by project
@@ -15,7 +15,6 @@ plugins {
     id("io.ktor.plugin") version "3.0.0-beta-1"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
     id("org.liquibase.gradle") version "2.2.1"
-    id("java")
 }
 
 group = "textsummarizer"
@@ -37,17 +36,21 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
     implementation("com.h2database:h2:$h2_version")
-    implementation("io.ktor:ktor-server-metrics-jvm")
     implementation("io.ktor:ktor-server-call-logging-jvm")
-    implementation("com.ucasoft.ktor:ktor-simple-cache:0.+")
+    implementation("com.ucasoft.ktor:ktor-simple-cache-jvm:0.+")
     implementation("com.ucasoft.ktor:ktor-simple-redis-cache-jvm:0.+")
     implementation("io.ktor:ktor-server-swagger-jvm")
-    implementation("io.ktor:ktor-server-openapi")
+    implementation("io.ktor:ktor-server-openapi-jvm")
     implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
-    implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
-    implementation("io.ktor:ktor-server-config-yaml")
+    implementation("io.ktor:ktor-server-config-yaml-jvm")
+
+    // monitoring
+    implementation("io.ktor:ktor-server-metrics-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-metrics-micrometer-jvm:$ktor_version")
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
 
     // various
     implementation("org.ktorm:ktorm-jackson:$ktorm_jackson_version")

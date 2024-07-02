@@ -9,7 +9,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import java.util.*
 
-fun Route.loginRoutes(){
+fun Route.loginRoutes() {
     post("/login") {
         val jwtAudience = environment.config.property("jwt.audience").getString()
         val jwtDomain = environment.config.property("jwt.domain").getString()

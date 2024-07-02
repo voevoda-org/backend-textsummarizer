@@ -1,24 +1,46 @@
 package textsummarizer.plugins
 
-import com.codahale.metrics.*
-import io.ktor.server.application.*
-import io.ktor.server.metrics.dropwizard.*
-import io.ktor.server.plugins.callloging.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import java.util.concurrent.TimeUnit
-import org.slf4j.event.*
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.request.path
+import io.micrometer.core.instrument.binder.jvm.ClassLoaderMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics
+import io.micrometer.core.instrument.binder.system.FileDescriptorMetrics
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics
+import io.micrometer.core.instrument.binder.system.UptimeMetrics
+import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import org.slf4j.event.Level
+import java.time.Duration
 
 fun Application.configureMonitoring() {
-//    install(DropwizardMetrics) {
-//        Slf4jReporter.forRegistry(registry)
-//            .outputTo(this@configureMonitoring.log)
-//            .convertRatesTo(TimeUnit.SECONDS)
-//            .convertDurationsTo(TimeUnit.MILLISECONDS)
+    val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+//        distributionStatisticConfig = DistributionStatisticConfig.Builder()
+//            .percentilesHistogram(true)
+//            .maximumExpectedValue(Duration.ofSeconds(20).toNanos().toDouble())
+//            .serviceLevelObjectives(
+//                Duration.ofMillis(100).toNanos().toDouble(),
+//                Duration.ofMillis(500).toNanos().toDouble()
+//            )
 //            .build()
-//            .start(10, TimeUnit.SECONDS)
-//    }
+//        meterBinders = listOf(
+//            ClassLoaderMetrics(),
+//            JvmMemoryMetrics(),
+//            JvmGcMetrics(),
+//            ProcessorMetrics(),
+//            JvmThreadMetrics(),
+//            FileDescriptorMetrics(),
+//            UptimeMetrics()
+//        )
+    }
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
