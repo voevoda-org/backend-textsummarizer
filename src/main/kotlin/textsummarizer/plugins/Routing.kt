@@ -6,9 +6,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import textsummarizer.routes.devicesRoute
 import textsummarizer.routes.loginRoutes
-import textsummarizer.routes.queriesRoute
+import textsummarizer.routes.queryRoutes
 
 fun Application.configureRouting() {
     routing {
@@ -19,8 +18,7 @@ fun Application.configureRouting() {
                 }
             }
             authenticate {
-                devicesRoute()
-                queriesRoute()
+                queryRoutes()
             }
             loginRoutes()
         }

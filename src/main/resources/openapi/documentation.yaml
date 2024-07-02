@@ -15,19 +15,28 @@ paths:
   /api/v1/login:
     post:
       description: "Takes the mobile_secret and returns a JWT token upon correct secret"
+      parameters:
+        - name: "deviceId"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
       responses:
         "400":
           description: "Wrong password"
           content:
             'text/plain':
               schema:
-                type: string
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Missing deviceId header"
         "200":
           description: "OK"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Login"
+                $ref: "#/components/schemas/LoginDto"
   /api/v1/queries:
     post:
       description: "Used to process a query to an AI model"
@@ -50,13 +59,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ChatGptResponse"
+                type: "string"
         "400":
           description: "Missing deviceId header"
           content:
             'text/plain':
               schema:
-                type: string
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Missing deviceId header"
   /api/v1/queries/{id}:
     get:
       description: ""
@@ -72,7 +84,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: "#/components/schemas/ChatGptResponse"
+                type: "string"
         "404":
           description: "Not Found"
           content:
@@ -118,10 +130,7 @@ components:
       required:
         - "queryText"
         - "queryType"
-    ChatGptResponse:
-      type: "object"
-      properties: { }
-    Login:
+    LoginDto:
       type: "object"
       properties:
         token:

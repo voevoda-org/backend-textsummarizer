@@ -7,20 +7,41 @@ import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import org.slf4j.LoggerFactory
+import textsummarizer.models.Device
+import textsummarizer.services.DeviceService
+import java.time.LocalDateTime
 import java.util.*
+
+private val deviceService = DeviceService()
+private val logger = LoggerFactory.getLogger("LoginRoutes")
 
 fun Route.loginRoutes() {
     post("/login") {
+        val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
+            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header")
+
+        deviceService.save(
+            Device {
+                this.id = id
+                this.createdAt = LocalDateTime.now()
+            }
+        )
+        logger.info("Added device $deviceId to database.")
+
         val jwtAudience = environment.config.property("jwt.audience").getString()
         val jwtDomain = environment.config.property("jwt.domain").getString()
         val jwtSecret = environment.config.property("jwt.secret").getString()
 
         val mobileSecret = call.receiveText()
         if (mobileSecret != environment.config.property("mobile.password").getString()) {
+            logger.warn("DevicedId $deviceId attempted login with $mobileSecret.")
             return@post call.respond(
                 HttpStatusCode.BadRequest
             )
         }
+
+        logger.info("Logged $deviceId in successfully.")
 
         val token = JWT.create()
             .withAudience(jwtAudience)

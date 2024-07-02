@@ -4,6 +4,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.server.plugins.NotFoundException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json.Default.decodeFromString
 import org.ktorm.dsl.eq
 import org.ktorm.entity.add
@@ -15,7 +17,6 @@ import textsummarizer.models.Query
 import textsummarizer.models.devices
 import textsummarizer.models.dto.ChatGptRequestDto
 import textsummarizer.models.dto.ChatGptRequestMessageDto
-import textsummarizer.models.dto.ChatGptResponse
 import textsummarizer.models.dto.EssayResult
 import textsummarizer.models.dto.MobileQueryDto
 import textsummarizer.models.dto.QueryInputDto
@@ -38,7 +39,7 @@ class ChatGptService {
 
     private val logger = LoggerFactory.getLogger("ChatGptService")
 
-    suspend fun query(mobileQueryDto: MobileQueryDto, deviceId: UUID): ChatGptResponse {
+    suspend fun query(mobileQueryDto: MobileQueryDto, deviceId: UUID): String {
         val queryOutputDto = mobileQueryDto.createQueryContent().toQueryOutputDto()
         logger.info("Calling OpenApi with: ${mobileQueryDto.queryText}")
         return openApiClient.post(queryUrl) {
@@ -51,17 +52,21 @@ class ChatGptService {
             .toQueryInputDomainModel()
             .let {
                 //Json.decodeFromString<ChatGptResponse>(it.choices[0].message.content)
-                when(mobileQueryDto.queryType){
+                when (mobileQueryDto.queryType) {
                     QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), it.choices[0].message.content)
                     QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), it.choices[0].message.content)
                     QueryType.QUESTION -> decodeFromString(QuestionsResult.serializer(), it.choices[0].message.content)
-                    QueryType.TRANSLATE -> decodeFromString(TranslationResult.serializer(), it.choices[0].message.content)
+                    QueryType.TRANSLATE -> decodeFromString(
+                        TranslationResult.serializer(),
+                        it.choices[0].message.content
+                    )
                 }
+                    .toText()
             }
             .also { chatGptResponse ->
                 persistToDatabase(
                     queryText = mobileQueryDto.queryText,
-                    response = chatGptResponse.toText(),
+                    response = chatGptResponse,
                     deviceId = deviceId
                 )
                 logger.info("OpenApi response: $chatGptResponse")
@@ -85,11 +90,16 @@ class ChatGptService {
         }
     }
 
-    fun getQuery(queryId: Int): Query? {
-        logger.info("Searching for query with id: $queryId")
-        val result = db.queries.find { Queries.id eq queryId }
-        logger.info("Found query: $result")
-        return result
+    suspend fun getQuery(queryId: Int): String? {
+        return withContext(Dispatchers.IO) {
+            this.runCatching {
+                db.queries.find { Queries.id eq queryId }
+            }
+                .onSuccess { logger.info("Found query: $it") }
+                .onFailure { logger.error("Exception", it) }
+        }
+            .getOrNull()
+            ?.query
     }
 
     private fun MobileQueryDto.createQueryContent() =
