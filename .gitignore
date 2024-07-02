@@ -37,3 +37,4 @@ out/
 
 ### Docker Compose ###
 docker-compose.yml
+monitoring/grafana
