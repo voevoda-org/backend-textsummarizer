@@ -1,18 +1,17 @@
 package textsummarizer.plugins
 
-import io.ktor.server.application.*
-import io.ktor.server.auth.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import io.ktor.server.application.Application
+import io.ktor.server.auth.authenticate
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import textsummarizer.routes.devicesRoute
 import textsummarizer.routes.loginRoutes
 import textsummarizer.routes.queriesRoute
-import textsummarizer.routes.metricRoutes
 
 fun Application.configureRouting() {
     routing {
-        metricRoutes()
-
         route("/api/v1") {
             route("/test") {
                 get {
