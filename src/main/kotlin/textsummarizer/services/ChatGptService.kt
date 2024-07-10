@@ -45,9 +45,12 @@ class ChatGptService {
         return openApiClient.post(queryUrl) {
             setBody(queryOutputDto)
         }
+            .also {
+                logger.debug("Received {}", it)
+            }
             .body<QueryInputDto>()
             .also {
-                logger.info("Received $this")
+                logger.debug("Received {}", it)
             }
             .toQueryInputDomainModel()
             .let {

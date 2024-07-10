@@ -21,14 +21,6 @@ fun Route.loginRoutes() {
         val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
             ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header")
 
-        deviceService.save(
-            Device {
-                this.id = id
-                this.createdAt = LocalDateTime.now()
-            }
-        )
-        logger.info("Added device $deviceId to database.")
-
         val jwtAudience = environment.config.property("jwt.audience").getString()
         val jwtDomain = environment.config.property("jwt.domain").getString()
         val jwtSecret = environment.config.property("jwt.secret").getString()
@@ -37,9 +29,16 @@ fun Route.loginRoutes() {
         if (mobileSecret != environment.config.property("mobile.password").getString()) {
             logger.warn("DevicedId $deviceId attempted login with $mobileSecret.")
             return@post call.respond(
-                HttpStatusCode.BadRequest
+                HttpStatusCode.BadRequest, "Wrong password."
             )
         }
+
+        deviceService.save(
+            Device {
+                this.id = deviceId
+                this.createdAt = LocalDateTime.now()
+            }
+        )
 
         logger.info("Logged $deviceId in successfully.")
 
