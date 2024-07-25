@@ -6,7 +6,6 @@ val logback_version: String by project
 val exposed_version: String by project
 val h2_version: String by project
 val ktorm_version: String by project
-val ktorm_jackson_version: String by project
 val postgres_version: String by project
 val liquibase_core: String by project
 
@@ -53,7 +52,7 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
 
     // various
-    implementation("org.ktorm:ktorm-jackson:$ktorm_jackson_version")
+    implementation("org.ktorm:ktorm-jackson:$ktorm_version")
 
     // client
     implementation("io.ktor:ktor-client-core")
