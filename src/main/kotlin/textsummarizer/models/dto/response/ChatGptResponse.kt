@@ -1,4 +1,4 @@
-package textsummarizer.models.dto
+package textsummarizer.models.dto.response
 
 import kotlinx.serialization.Serializable
 
@@ -8,13 +8,13 @@ sealed class ChatGptResponse {
 }
 
 @Serializable
-class EssayResult(val essay: String) : ChatGptResponse() {
+class EssayResult(private val essay: String) : ChatGptResponse() {
     override fun toText(): String = essay
 }
 
 @Serializable
 class QuestionsResult(
-    val questions: List<Question>,
+    private val questions: List<Question>,
 ) : ChatGptResponse() {
     override fun toText(): String = questions.joinToString("\n") { "\n${it.question}\n${it.answer}" }
 }
@@ -28,15 +28,15 @@ data class Question(
 
 @Serializable
 class SummaryResult(
-    val title: String,
-    val summary: String,
+    private val title: String,
+    private val summary: String,
 ) : ChatGptResponse() {
     override fun toText(): String = "Title: $title\nSummary: $summary"
 }
 
 @Serializable
 class TranslationResult(
-    val translation: String,
+    private val translation: String,
 ) : ChatGptResponse() {
     override fun toText(): String = translation
 }

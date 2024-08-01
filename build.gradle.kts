@@ -34,25 +34,26 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    implementation("com.h2database:h2:$h2_version")
     implementation("io.ktor:ktor-server-call-logging-jvm")
-    implementation("com.ucasoft.ktor:ktor-simple-cache-jvm:0.+")
-    implementation("com.ucasoft.ktor:ktor-simple-redis-cache-jvm:0.+")
     implementation("io.ktor:ktor-server-swagger-jvm")
     implementation("io.ktor:ktor-server-openapi-jvm")
     implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml-jvm")
 
+    // logging
+    implementation("ch.qos.logback:logback-classic:$logback_version")
+
+    // caching
+    implementation("com.ucasoft.ktor:ktor-simple-cache-jvm:0.+")
+    implementation("com.ucasoft.ktor:ktor-simple-redis-cache-jvm:0.+")
+
     // monitoring
-    implementation("io.ktor:ktor-server-metrics-jvm:$ktor_version")
-    implementation("io.ktor:ktor-server-metrics-micrometer-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-metrics-jvm")
+    implementation("io.ktor:ktor-server-metrics-micrometer-jvm")
     implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
 
-    // various
-    implementation("org.ktorm:ktorm-jackson:$ktorm_version")
 
     // client
     implementation("io.ktor:ktor-client-core")
@@ -60,10 +61,12 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation-jvm")
 
     // database
+    implementation("org.ktorm:ktorm-core:$ktorm_version")
+    implementation("org.ktorm:ktorm-jackson:$ktorm_version")
     implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")
     implementation("org.postgresql:postgresql:$postgres_version")
-    implementation("org.ktorm:ktorm-core:$ktorm_version")
     implementation("org.apache.commons:commons-dbcp2:2.9.0")
+    implementation("com.h2database:h2:$h2_version")
 
     // liquibase
     liquibaseRuntime("org.liquibase:liquibase-core:$liquibase_core")

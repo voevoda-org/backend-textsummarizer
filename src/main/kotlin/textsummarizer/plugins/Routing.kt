@@ -8,8 +8,11 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import textsummarizer.routes.loginRoutes
 import textsummarizer.routes.queryRoutes
+import textsummarizer.services.ChatGptService
+import textsummarizer.services.DeviceService
+import textsummarizer.services.JwtService
 
-fun Application.configureRouting() {
+fun Application.configureRouting(jwtService: JwtService, deviceService: DeviceService, chatGptService: ChatGptService) {
     routing {
         route("/api/v1") {
             route("/test") {
@@ -18,9 +21,11 @@ fun Application.configureRouting() {
                 }
             }
             authenticate {
-                queryRoutes()
+                queryRoutes(deviceService, chatGptService)
             }
-            loginRoutes()
+            route("/auth") {
+                loginRoutes(jwtService, deviceService)
+            }
         }
     }
 }

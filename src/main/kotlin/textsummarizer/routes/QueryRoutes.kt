@@ -11,11 +11,9 @@ import textsummarizer.services.ChatGptService
 import textsummarizer.services.DeviceService
 import java.util.*
 
-private val chatGptService = ChatGptService()
-private val deviceService = DeviceService()
 private val logger = LoggerFactory.getLogger("QueryRoutes")
 
-fun Route.queryRoutes() {
+fun Route.queryRoutes(deviceService: DeviceService, chatGptService: ChatGptService) {
     route("/queries") {
         post {
             val mobileQueryDto = call.receive<MobileQueryDto>()

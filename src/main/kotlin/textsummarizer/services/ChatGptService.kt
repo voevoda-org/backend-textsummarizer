@@ -15,17 +15,17 @@ import textsummarizer.models.ChatGPTQuery
 import textsummarizer.models.Queries
 import textsummarizer.models.Query
 import textsummarizer.models.devices
-import textsummarizer.models.dto.ChatGptRequestDto
-import textsummarizer.models.dto.ChatGptRequestMessageDto
-import textsummarizer.models.dto.EssayResult
+import textsummarizer.models.dto.request.ChatGptRequestDto
+import textsummarizer.models.dto.request.ChatGptRequestMessageDto
+import textsummarizer.models.dto.response.EssayResult
 import textsummarizer.models.dto.MobileQueryDto
 import textsummarizer.models.dto.QueryInputDto
 import textsummarizer.models.dto.QueryOutputDto
 import textsummarizer.models.dto.QueryOutputMessageDto
 import textsummarizer.models.dto.QueryType
-import textsummarizer.models.dto.QuestionsResult
-import textsummarizer.models.dto.SummaryResult
-import textsummarizer.models.dto.TranslationResult
+import textsummarizer.models.dto.response.QuestionsResult
+import textsummarizer.models.dto.response.SummaryResult
+import textsummarizer.models.dto.response.TranslationResult
 import textsummarizer.models.mapper.QueryInputDtoMapper.toQueryInputDomainModel
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
@@ -67,7 +67,7 @@ class ChatGptService {
                     .toText()
             }
             .also { chatGptResponse ->
-                persistToDatabase(
+                save(
                     queryText = mobileQueryDto.queryText,
                     response = chatGptResponse,
                     deviceId = deviceId
@@ -76,10 +76,11 @@ class ChatGptService {
             }
     }
 
-    private fun persistToDatabase(queryText: String, response: String, deviceId: UUID) {
+    private fun save(queryText: String, response: String, deviceId: UUID) {
         Query {
             this.query = queryText
             this.response = response
+            // TODO propagate the NotFound to the end
             this.device = db.devices.find { it.id eq deviceId } ?: throw NotFoundException("DeviceId not found")
             this.createdAt = LocalDateTime.now()
         }.let {

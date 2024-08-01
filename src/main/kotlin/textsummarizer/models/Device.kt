@@ -3,9 +3,11 @@ package textsummarizer.models
 import org.ktorm.database.Database
 import org.ktorm.entity.Entity
 import org.ktorm.entity.sequenceOf
-import org.ktorm.schema.*
+import org.ktorm.schema.Table
+import org.ktorm.schema.datetime
+import org.ktorm.schema.uuid
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 interface Device : Entity<Device> {
     companion object : Entity.Factory<Device>()

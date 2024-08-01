@@ -1,40 +1,38 @@
 package textsummarizer.routes
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.request.receive
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import org.slf4j.LoggerFactory
 import textsummarizer.models.Device
+import textsummarizer.models.dto.request.RefreshTokenRequest
+import textsummarizer.models.dto.response.AuthResponse
+import textsummarizer.models.dto.response.RefreshTokenResponse
+import textsummarizer.services.JwtService
 import textsummarizer.services.DeviceService
 import java.time.LocalDateTime
 import java.util.*
 
-private val deviceService = DeviceService()
 private val logger = LoggerFactory.getLogger("LoginRoutes")
 
-fun Route.loginRoutes() {
+fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
     post("/login") {
         val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
-            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header")
-
-        val jwtAudience = environment.config.property("jwt.audience").getString()
-        val jwtDomain = environment.config.property("jwt.domain").getString()
-        val jwtSecret = environment.config.property("jwt.secret").getString()
+            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
 
         val mobileSecret = call.receiveText()
         if (mobileSecret != environment.config.property("mobile.password").getString()) {
-            logger.warn("DevicedId $deviceId attempted login with $mobileSecret.")
+            logger.warn("DeviceId $deviceId attempted login with $mobileSecret.")
             return@post call.respond(
-                HttpStatusCode.BadRequest, "Wrong password."
+                HttpStatusCode.Unauthorized, "Wrong password."
             )
         }
 
         deviceService.save(
-            Device {
+            Device{
                 this.id = deviceId
                 this.createdAt = LocalDateTime.now()
             }
@@ -42,11 +40,32 @@ fun Route.loginRoutes() {
 
         logger.info("Logged $deviceId in successfully.")
 
-        val token = JWT.create()
-            .withAudience(jwtAudience)
-            .withIssuer(jwtDomain)
-            .withExpiresAt(Date(System.currentTimeMillis() + (10 * 60000))) // 10 minutes
-            .sign(Algorithm.HMAC256(jwtSecret))
-        call.respond(hashMapOf("token" to token))
+        call.respond(
+            AuthResponse(
+                accessToken = jwtService.createAccessToken(),
+                refreshToken = jwtService.createRefreshToken(deviceId),
+            )
+        )
+    }
+
+    post("/refresh") {
+        val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
+            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
+
+        if (!deviceService.exists(deviceId)) {
+            return@post call.respond(
+                HttpStatusCode.Unauthorized,
+                "Can't refresh for unregistered device with id: $deviceId."
+            )
+        }
+
+        val refreshTokenRequest = call.receive<RefreshTokenRequest>()
+
+        jwtService.refreshToken(
+            refreshToken = refreshTokenRequest.refreshToken,
+            deviceId = deviceId
+        )
+            ?.let { refreshToken -> call.respond(RefreshTokenResponse(accessToken = refreshToken)) }
+            ?: call.respond(HttpStatusCode.Unauthorized)
     }
 }
