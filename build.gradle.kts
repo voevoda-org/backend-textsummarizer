@@ -10,14 +10,14 @@ val postgres_version: String by project
 val liquibase_core: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.0"
+    kotlin("jvm") version "2.0.10"
     id("io.ktor.plugin") version "3.0.0-beta-1"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
     id("org.liquibase.gradle") version "2.2.1"
 }
 
 group = "textsummarizer"
-version = "0.0.1"
+version = "0.0.2"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -133,5 +133,6 @@ ktor {
                 password = providers.environmentVariable("DOCKER_HUB_PASSWORD")
             )
         )
+        imageTag.set("0.0.2")
     }
 }
