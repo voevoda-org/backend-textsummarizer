@@ -44,18 +44,22 @@ class JwtService(
         .sign(Algorithm.HMAC256(jwtSecret))
 
     suspend fun refreshToken(deviceId: UUID, refreshToken: String): String? =
-        verifyRefreshToken(deviceId, refreshToken)?.let {
-            createAccessToken()
-        }
+        verifyRefreshToken(deviceId, refreshToken)
+            ?.let { createAccessToken() }
 
     private suspend fun verifyRefreshToken(deviceId: UUID, token: String): DecodedJWT? {
         val decodedJwt = verifier.verify(token)
         val deviceIdFromToken = decodedJwt.getClaim("deviceId").`as`(UUID::class.java)
-        return if (deviceIdFromToken == deviceId && deviceService.exists(deviceIdFromToken)) {
-            decodedJwt
+        if (deviceIdFromToken == deviceId) {
+            if (deviceService.exists(deviceIdFromToken)) {
+                return decodedJwt
+            } else {
+                logger.error("DeviceId $deviceIdFromToken does not exist in db.")
+                return null
+            }
         } else {
-            logger.warn("Could not verify refresh token for deviceId: $deviceIdFromToken")
-            null
+            logger.error("Header DeviceId $deviceId and token DeviceId $deviceIdFromToken do not match.")
+            return null
         }
     }
 }

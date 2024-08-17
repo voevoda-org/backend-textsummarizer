@@ -18,17 +18,14 @@ import io.micrometer.core.instrument.binder.system.UptimeMetrics
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import java.time.Duration
 
 fun Application.configureMonitoring() {
 
-    val logger = LoggerFactory.getLogger("Metrics")
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     install(MicrometerMetrics) {
-        registry = appMicrometerRegistry
         distributionStatisticConfig = DistributionStatisticConfig.Builder()
             .percentilesHistogram(true)
             .maximumExpectedValue(Duration.ofSeconds(20).toNanos().toDouble())
@@ -46,15 +43,15 @@ fun Application.configureMonitoring() {
             FileDescriptorMetrics(),
             UptimeMetrics()
         )
+        registry = appMicrometerRegistry
     }
     install(CallLogging) {
         level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+        filter { call -> call.request.path().startsWith("/api/v1/") }
     }
 
     routing {
         get("/metrics") {
-            logger.info("Hello")
             call.respondText(appMicrometerRegistry.scrape())
         }
     }

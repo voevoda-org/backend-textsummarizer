@@ -38,7 +38,7 @@ fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
             }
         )
 
-        logger.info("Logged $deviceId in successfully.")
+        logger.info("Device $deviceId logged in successfully.")
 
         call.respond(
             AuthResponse(

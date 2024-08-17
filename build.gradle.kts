@@ -50,10 +50,8 @@ dependencies {
     implementation("com.ucasoft.ktor:ktor-simple-redis-cache-jvm:0.+")
 
     // monitoring
-    implementation("io.ktor:ktor-server-metrics-jvm")
     implementation("io.ktor:ktor-server-metrics-micrometer-jvm")
-    implementation("io.micrometer:micrometer-registry-prometheus:1.13.1")
-
+    implementation("io.micrometer:micrometer-registry-prometheus:1.13.+")
 
     // client
     implementation("io.ktor:ktor-client-core")
@@ -76,7 +74,9 @@ dependencies {
     liquibaseRuntime("ch.qos.logback:logback-classic:1.4.12")
     liquibaseRuntime("javax.xml.bind:jaxb-api:2.3.1")
 
+    // testing
     testImplementation("io.ktor:ktor-server-tests-jvm")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.0-beta-1")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
 
@@ -133,6 +133,6 @@ ktor {
                 password = providers.environmentVariable("DOCKER_HUB_PASSWORD")
             )
         )
-        imageTag.set("0.0.2")
+        imageTag.set(version.toString())
     }
 }
