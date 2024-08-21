@@ -1,13 +1,14 @@
 import java.util.*
 
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
-val exposed_version: String by project
-val h2_version: String by project
-val ktorm_version: String by project
-val postgres_version: String by project
-val liquibase_core: String by project
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
+val exposedVersion: String by project
+val h2Version: String by project
+val ktormVersion: String by project
+val postgresVersion: String by project
+val liquibaseCoreVersion: String by project
+val mockkVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.0.10"
@@ -43,7 +44,7 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml-jvm")
 
     // logging
-    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
 
     // caching
     implementation("com.ucasoft.ktor:ktor-simple-cache-jvm:0.+")
@@ -59,16 +60,16 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation-jvm")
 
     // database
-    implementation("org.ktorm:ktorm-core:$ktorm_version")
-    implementation("org.ktorm:ktorm-jackson:$ktorm_version")
-    implementation("org.ktorm:ktorm-support-postgresql:$ktorm_version")
-    implementation("org.postgresql:postgresql:$postgres_version")
+    implementation("org.ktorm:ktorm-core:$ktormVersion")
+    implementation("org.ktorm:ktorm-jackson:$ktormVersion")
+    implementation("org.ktorm:ktorm-support-postgresql:$ktormVersion")
+    implementation("org.postgresql:postgresql:$postgresVersion")
     implementation("org.apache.commons:commons-dbcp2:2.9.0")
-    implementation("com.h2database:h2:$h2_version")
+    implementation("com.h2database:h2:$h2Version")
 
     // liquibase
-    liquibaseRuntime("org.liquibase:liquibase-core:$liquibase_core")
-    liquibaseRuntime("org.postgresql:postgresql:$postgres_version")
+    liquibaseRuntime("org.liquibase:liquibase-core:$liquibaseCoreVersion")
+    liquibaseRuntime("org.postgresql:postgresql:$postgresVersion")
     liquibaseRuntime("info.picocli:picocli:4.7.3")
     liquibaseRuntime("ch.qos.logback:logback-core:1.4.14")
     liquibaseRuntime("ch.qos.logback:logback-classic:1.4.12")
@@ -77,7 +78,8 @@ dependencies {
     // testing
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.0-beta-1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
 }
 
 // database migrations

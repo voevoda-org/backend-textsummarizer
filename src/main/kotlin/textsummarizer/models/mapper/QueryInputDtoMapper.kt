@@ -4,12 +4,12 @@ import textsummarizer.models.QueryInputChoiceDomainModel
 import textsummarizer.models.QueryInputDomainModel
 import textsummarizer.models.QueryInputMessageDomainModel
 import textsummarizer.models.QueryInputUsageDomainModel
-import textsummarizer.models.dto.QueryInputDto
+import textsummarizer.models.dto.ChatGPTQueryResponse
 import textsummarizer.models.dto.QueryInputMessageDto
 
 object QueryInputDtoMapper {
 
-    fun QueryInputDto.toQueryInputDomainModel() =
+    fun ChatGPTQueryResponse.toQueryInputDomainModel() =
         QueryInputDomainModel(
             id = id,
             obj = obj,
@@ -17,7 +17,8 @@ object QueryInputDtoMapper {
             model = model,
             choices = choices.map {
                 QueryInputChoiceDomainModel(
-                    index = it.index, message = it.queryInputMessageDto.toQueryInputMessageDomainModel(),
+                    index = it.index,
+                    message = it.queryInputMessageDto.toQueryInputMessageDomainModel(),
                     logProbs = it.logProbs,
                     finishReason = it.finishReason
                 )

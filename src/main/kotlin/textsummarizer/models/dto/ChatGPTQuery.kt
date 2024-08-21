@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QueryOutputDto(
+data class ChatGPTQuery(
     @SerialName("model") val model: String,
     @SerialName("messages") val messages: List<QueryOutputMessageDto>,
     @SerialName("temperature") val temperature: Float,

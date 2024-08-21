@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class QueryInputDto(
+data class ChatGPTQueryResponse(
     @SerialName("id") val id: String,
     @SerialName("object") val obj: String,
     @SerialName("created") val created: Long,

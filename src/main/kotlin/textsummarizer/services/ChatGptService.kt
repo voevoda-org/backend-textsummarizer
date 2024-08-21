@@ -11,7 +11,7 @@ import org.ktorm.dsl.eq
 import org.ktorm.entity.add
 import org.ktorm.entity.find
 import org.slf4j.LoggerFactory
-import textsummarizer.models.ChatGPTQuery
+import textsummarizer.models.ChatGPTQueryType
 import textsummarizer.models.Queries
 import textsummarizer.models.Query
 import textsummarizer.models.devices
@@ -19,8 +19,8 @@ import textsummarizer.models.dto.request.ChatGptRequestDto
 import textsummarizer.models.dto.request.ChatGptRequestMessageDto
 import textsummarizer.models.dto.response.EssayResult
 import textsummarizer.models.dto.MobileQueryDto
-import textsummarizer.models.dto.QueryInputDto
-import textsummarizer.models.dto.QueryOutputDto
+import textsummarizer.models.dto.ChatGPTQueryResponse
+import textsummarizer.models.dto.ChatGPTQuery
 import textsummarizer.models.dto.QueryOutputMessageDto
 import textsummarizer.models.dto.QueryType
 import textsummarizer.models.dto.response.QuestionsResult
@@ -29,7 +29,7 @@ import textsummarizer.models.dto.response.TranslationResult
 import textsummarizer.models.mapper.QueryInputDtoMapper.toQueryInputDomainModel
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
-import textsummarizer.utils.HttpClient.openApiClient
+import textsummarizer.utils.ChatGPTHttpClient.openApiClient
 import java.time.LocalDateTime
 import java.util.*
 
@@ -45,16 +45,12 @@ class ChatGptService {
         return openApiClient.post(queryUrl) {
             setBody(queryOutputDto)
         }
-            .also {
-                logger.debug("Received {}", it)
-            }
-            .body<QueryInputDto>()
-            .also {
-                logger.debug("Received {}", it)
-            }
+            .also { logger.debug("Received {}", it) }
+            .body<ChatGPTQueryResponse>()
             .toQueryInputDomainModel()
             .let {
                 //Json.decodeFromString<ChatGptResponse>(it.choices[0].message.content)
+                // TODO Fallback for when there is a discrepancy in the JSON
                 when (mobileQueryDto.queryType) {
                     QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), it.choices[0].message.content)
                     QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), it.choices[0].message.content)
@@ -108,14 +104,14 @@ class ChatGptService {
 
     private fun MobileQueryDto.createQueryContent() =
         when (this.queryType) {
-            QueryType.SUMMARIZE -> ChatGPTQuery.Summarize(this.queryText)
-            QueryType.ESSAY -> ChatGPTQuery.Essay(this.queryText)
-            QueryType.QUESTION -> ChatGPTQuery.Question(this.queryText)
-            QueryType.TRANSLATE -> ChatGPTQuery.Translate(this.queryText)
+            QueryType.SUMMARIZE -> ChatGPTQueryType.Summarize(this.queryText)
+            QueryType.ESSAY -> ChatGPTQueryType.Essay(this.queryText)
+            QueryType.QUESTION -> ChatGPTQueryType.Question(this.queryText)
+            QueryType.TRANSLATE -> ChatGPTQueryType.Translate(this.queryText)
         }
 
-    private fun ChatGPTQuery.toQueryOutputDto() =
-        QueryOutputDto(
+    private fun ChatGPTQueryType.toQueryOutputDto() =
+        ChatGPTQuery(
             model = "gpt-3.5-turbo",
             messages = listOf(
                 QueryOutputMessageDto(
