@@ -6,6 +6,7 @@ import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import org.slf4j.LoggerFactory
 import textsummarizer.models.Device
 import textsummarizer.models.dto.request.RefreshTokenRequest
@@ -19,53 +20,55 @@ import java.util.*
 private val logger = LoggerFactory.getLogger("LoginRoutes")
 
 fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
-    post("/login") {
-        val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
-            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
+    route("/auth") {
+        post("/login") {
+            val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
 
-        val mobileSecret = call.receiveText()
-        if (mobileSecret != environment.config.property("mobile.password").getString()) {
-            logger.warn("DeviceId $deviceId attempted login with $mobileSecret.")
-            return@post call.respond(
-                HttpStatusCode.Unauthorized, "Wrong password."
-            )
-        }
-
-        deviceService.save(
-            Device{
-                this.id = deviceId
-                this.createdAt = LocalDateTime.now()
+            val mobileSecret = call.receiveText()
+            if (mobileSecret != environment.config.property("mobile.password").getString()) {
+                logger.warn("DeviceId $deviceId attempted login with $mobileSecret.")
+                return@post call.respond(
+                    HttpStatusCode.Unauthorized, "Wrong password."
+                )
             }
-        )
 
-        logger.info("Device $deviceId logged in successfully.")
-
-        call.respond(
-            AuthResponse(
-                accessToken = jwtService.createAccessToken(),
-                refreshToken = jwtService.createRefreshToken(deviceId),
+            deviceService.save(
+                Device {
+                    this.id = deviceId
+                    this.createdAt = LocalDateTime.now()
+                }
             )
-        )
-    }
 
-    post("/refresh") {
-        val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
-            ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
+            logger.info("Device $deviceId logged in successfully.")
 
-        if (!deviceService.exists(deviceId)) {
-            return@post call.respond(
-                HttpStatusCode.Unauthorized,
-                "Can't refresh for unregistered device with id: $deviceId."
+            call.respond(
+                AuthResponse(
+                    accessToken = jwtService.createAccessToken(),
+                    refreshToken = jwtService.createRefreshToken(deviceId),
+                )
             )
         }
 
-        val refreshTokenRequest = call.receive<RefreshTokenRequest>()
+        post("/refresh") {
+            val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
+                ?: return@post call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
 
-        jwtService.refreshToken(
-            refreshToken = refreshTokenRequest.refreshToken,
-            deviceId = deviceId
-        )
-            ?.let { refreshToken -> call.respond(RefreshTokenResponse(accessToken = refreshToken)) }
-            ?: call.respond(HttpStatusCode.Unauthorized)
+            if (!deviceService.exists(deviceId)) {
+                return@post call.respond(
+                    HttpStatusCode.Unauthorized,
+                    "Can't refresh for unregistered device with id: $deviceId."
+                )
+            }
+
+            val refreshTokenRequest = call.receive<RefreshTokenRequest>()
+
+            jwtService.refreshToken(
+                refreshToken = refreshTokenRequest.refreshToken,
+                deviceId = deviceId
+            )
+                ?.let { refreshToken -> call.respond(RefreshTokenResponse(accessToken = refreshToken)) }
+                ?: call.respond(HttpStatusCode.Unauthorized)
+        }
     }
 }
