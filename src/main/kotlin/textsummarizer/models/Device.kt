@@ -13,11 +13,13 @@ interface Device : Entity<Device> {
     companion object : Entity.Factory<Device>()
 
     var id: UUID
+    var subscriptionId: UUID?
     var createdAt: LocalDateTime
 }
 
 object Devices : Table<Device>("devices") {
     val id = uuid("id").primaryKey().bindTo { it.id }
+    val subscriptionId = uuid("subscriptionId").bindTo { it.subscriptionId }
     val createdAt = datetime("created_at").bindTo { it.createdAt }
 }
 

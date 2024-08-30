@@ -136,18 +136,55 @@ paths:
         "404":
           description: "Not Found"
           content:
-            '*/*':
+            'text/plain':
               schema:
                 type: "object"
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'text/plain':
               schema:
                 type: "string"
               examples:
                 Example#1:
                   value: "Invalid id"
+  /api/v1/subscription:
+    get:
+      description: ""
+      parameters:
+        - name: "deviceId"
+          in: "header"
+          required: false
+          schema:
+            type: "string"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'text/plain':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Device with id: $deviceId is not registered."
+                Example#2:
+                  value: "Missing deviceId header."
+        "200":
+          description: "OK"
+          content:
+            'text/plain':
+              schema:
+                type: "string"
+                format: "uuid"
+        "404":
+          description: "Not Found"
+          content:
+            'text/plain':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Subscription not found for device with id: $deviceId."
   /api/v1/test:
     get:
       description: "Endpoint for testing if the application is up and running :)"

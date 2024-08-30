@@ -24,7 +24,7 @@ fun Application.configureRouting(jwtService: JwtService, deviceService: DeviceSe
             authenticate {
                 queryRoutes(deviceService, chatGptService)
             }
-            subscriptionRoutes()
+            subscriptionRoutes(deviceService)
             loginRoutes(jwtService, deviceService)
         }
     }

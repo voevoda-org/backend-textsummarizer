@@ -1,16 +1,12 @@
 package textsummarizer.routes
 
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.install
 import io.ktor.server.application.log
 import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.response.respond
@@ -18,17 +14,11 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.encodeToJsonElement
 import textsummarizer.models.dto.ChatGPTQueryResponse
-import textsummarizer.models.dto.MobileQueryDto
-import textsummarizer.models.dto.QueryType
-import textsummarizer.module
 import textsummarizer.services.DeviceService
 import textsummarizer.services.JwtService
 import textsummarizer.util.baseUrl
 import textsummarizer.util.defaultDeviceId
-import textsummarizer.util.httpClient
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.expect
