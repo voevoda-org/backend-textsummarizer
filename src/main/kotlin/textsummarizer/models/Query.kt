@@ -21,7 +21,7 @@ object Queries : Table<Query>("queries") {
     val query = text("query").bindTo { it.query }
     val response = text("response").bindTo { it.response }
     val createdAt = datetime("created_at").bindTo { it.createdAt }
-    val deviceId = uuid("deviceId").references(Devices) { it.device }
+    val deviceId = uuid("device_id").references(Devices) { it.device }
 }
 
 val Database.queries get() = this.sequenceOf(Queries)

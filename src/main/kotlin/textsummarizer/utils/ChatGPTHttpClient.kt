@@ -3,6 +3,7 @@ package textsummarizer.utils
 import com.typesafe.config.ConfigFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpSend
@@ -26,11 +27,14 @@ object ChatGPTHttpClient {
     private val chatGptAuthKey = config.property("chatGpt.authKey").getString()
     val openApiClient: HttpClient = HttpClient(CIO) {
         HttpResponseValidator {
-            validateResponse { response ->
-                logger.debug(response.toString())
-                when(response.status){
-                    HttpStatusCode.Unauthorized -> throw ChatGPTApiAuthorizationException(response.status)
-                    else -> throw ChatGPTGenericErrorException(response.status)
+            handleResponseExceptionWithRequest { exception, request ->
+                logger.debug(exception.toString())
+                val clientException = exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
+                val exceptionResponse = clientException.response
+                if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
+                    throw ChatGPTApiAuthorizationException(exception.response.status)
+                } else {
+                    throw ChatGPTGenericErrorException(exception.response.status)
                 }
             }
         }

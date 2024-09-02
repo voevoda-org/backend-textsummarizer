@@ -25,6 +25,7 @@ fun Application.module() {
     configureHTTP()
     configureSecurity(jwtService)
 
+    // init db
     DatabaseFactory.db
 
     configureRouting(jwtService, deviceService, chatGptService)

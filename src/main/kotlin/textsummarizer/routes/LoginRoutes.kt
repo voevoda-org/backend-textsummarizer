@@ -36,6 +36,7 @@ fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
             deviceService.save(
                 Device {
                     this.id = deviceId
+                    this.subscriptionId = null
                     this.createdAt = LocalDateTime.now()
                 }
             )

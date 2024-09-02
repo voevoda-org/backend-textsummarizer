@@ -19,7 +19,7 @@ interface Device : Entity<Device> {
 
 object Devices : Table<Device>("devices") {
     val id = uuid("id").primaryKey().bindTo { it.id }
-    val subscriptionId = uuid("subscriptionId").bindTo { it.subscriptionId }
+    val subscriptionId = uuid("subscription_id").bindTo { it.subscriptionId }
     val createdAt = datetime("created_at").bindTo { it.createdAt }
 }
 
