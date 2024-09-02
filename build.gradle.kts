@@ -1,9 +1,9 @@
+import org.jetbrains.kotlin.gradle.utils.loadPropertyFromResources
 import java.util.*
 
 val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
-val exposedVersion: String by project
 val h2Version: String by project
 val ktormVersion: String by project
 val postgresVersion: String by project
@@ -18,7 +18,7 @@ plugins {
 }
 
 group = "textsummarizer"
-version = "0.0.2"
+version = "0.0.3"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -86,17 +86,16 @@ dependencies {
 val dbEnv: String by project.extra
 
 val propertiesFile = file("local.properties")
-val properties = Properties()
 if (propertiesFile.exists()) {
-    properties.load(propertiesFile.inputStream())
-    println(properties.getProperty("liquibase.dev.url"))
+    Properties().load(propertiesFile.inputStream())
+    println(properties["liquibase.dev.url"])
 }
 
 liquibase {
     activities.register("dev") {
-        val url = properties.getProperty("liquibase.dev.url") ?: System.getenv("LIQUIBASE_DEV_URL")
-        val user = properties.getProperty("liquibase.dev.user") ?: System.getenv("LIQUIBASE_DEV_USER")
-        val password = properties.getProperty("liquibase.dev.password") ?: System.getenv("LIQUIBASE_DEV_PASSWORD")
+        val url = properties["liquibase.dev.url"] ?: System.getenv("LIQUIBASE_DEV_URL")
+        val user = properties["liquibase.dev.user"] ?: System.getenv("LIQUIBASE_DEV_USER")
+        val password = properties["liquibase.dev.password"] ?: System.getenv("LIQUIBASE_DEV_PASSWORD")
 
         this.arguments = mapOf(
             "logLevel" to "info",
@@ -136,5 +135,6 @@ ktor {
             )
         )
         imageTag.set(version.toString())
+        jreVersion.set(JavaVersion.VERSION_21)
     }
 }
