@@ -18,7 +18,8 @@ fun Route.subscriptionRoutes(deviceService: DeviceService) {
                 ?.let { UUID.fromString(it) }
                 ?: return@get call.respond(HttpStatusCode.BadRequest, "Missing deviceId header.")
             if (!deviceService.exists(deviceId)) {
-                call.respond(HttpStatusCode.BadRequest, "Device with id: $deviceId is not registered.")
+                logger.debug("Device with id: {} is not registered.", deviceId)
+                return@get call.respond(HttpStatusCode.BadRequest, "Device with id: $deviceId is not registered.")
             }
 
             logger.info("Retrieving subscription for device with id: $deviceId")

@@ -1,6 +1,5 @@
 package textsummarizer.routes
 
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
@@ -87,12 +86,5 @@ class QueryRoutesTest {
 
         expect(HttpStatusCode.OK) { response.status }
         expect("This is a test. Please ignore.") { response.bodyAsText() }
-    }
-
-    @Test
-    fun testGetQueriesId() = testApplication {
-        client.get("/queries/{id}").apply {
-            TODO("Please write your test here")
-        }
     }
 }

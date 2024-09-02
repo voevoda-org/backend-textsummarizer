@@ -47,7 +47,10 @@ fun Application.configureMonitoring() {
     }
     install(CallLogging) {
         level = Level.INFO
-        filter { call -> call.request.path().startsWith("/api/v1/") }
+        filter { call ->
+            val path = call.request.path()
+            path.startsWith("/api/v1/") && !path.startsWith("/metrics")
+        }
     }
 
     routing {

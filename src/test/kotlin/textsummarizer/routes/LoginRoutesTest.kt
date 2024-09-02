@@ -15,6 +15,7 @@ import textsummarizer.models.dto.request.RefreshTokenRequest
 import textsummarizer.models.dto.response.AuthResponse
 import textsummarizer.util.baseUrl
 import textsummarizer.util.defaultDeviceId
+import textsummarizer.util.mobilePassword
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -52,7 +53,7 @@ class LoginRoutesTest {
         testApplication {
             val url = "$baseUrl/auth/login"
             val response = client.post(url) {
-                setBody("test123")
+                setBody(mobilePassword)
                 header("deviceId", defaultDeviceId)
             }
 
@@ -95,7 +96,7 @@ class LoginRoutesTest {
             }
         }
         val refreshToken = client.post("$url/login") {
-            setBody("test123")
+            setBody(mobilePassword)
             header("deviceId", defaultDeviceId)
         }.body<AuthResponse>()
             .refreshToken
@@ -118,7 +119,7 @@ class LoginRoutesTest {
             }
         }
         val refreshToken = client.post("$url/login") {
-            setBody("test123")
+            setBody(mobilePassword)
             header("deviceId", UUID.randomUUID())
         }.body<AuthResponse>()
             .refreshToken
@@ -141,7 +142,7 @@ class LoginRoutesTest {
             }
         }
         val refreshToken = client.post("$url/login") {
-            setBody("test123")
+            setBody(mobilePassword)
             header("deviceId", defaultDeviceId)
         }.body<AuthResponse>()
             .refreshToken
