@@ -8,10 +8,9 @@ val mockkVersion: String by project
 val flywayVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.0.10"
+    kotlin("jvm") version "2.0.21"
     id("io.ktor.plugin") version "3.0.0-beta-1"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
-    id("org.liquibase.gradle") version "2.2.1"
 }
 
 group = "textsummarizer"
@@ -61,11 +60,12 @@ dependencies {
     implementation("org.ktorm:ktorm-jackson:$ktormVersion")
     implementation("org.ktorm:ktorm-support-postgresql:$ktormVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
-    implementation("org.apache.commons:commons-dbcp2:2.9.0")
+    implementation("org.apache.commons:commons-dbcp2:2.12.0")
     implementation("com.h2database:h2:$h2Version")
 
     // flyway
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 
     // testing
     testImplementation("io.ktor:ktor-server-tests-jvm")

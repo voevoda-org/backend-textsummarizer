@@ -30,7 +30,7 @@ object DatabaseFactory {
 
     private fun setupDataSource(): BasicDataSource {
         return BasicDataSource().apply {
-            driverClassName = config.property("db.driver").getString()
+            driverClassName = "org.postgresql.Driver"
             url = config.property("db.url").getString()
             username = config.property("db.user").getString()
             password = config.property("db.password").getString()
