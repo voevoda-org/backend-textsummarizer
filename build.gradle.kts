@@ -1,4 +1,3 @@
-val ktorVersion: String by project
 val kotlinVersion: String by project
 val logbackVersion: String by project
 val h2Version: String by project
@@ -9,12 +8,12 @@ val flywayVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.0.21"
-    id("io.ktor.plugin") version "3.0.0-beta-1"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
+    id("io.ktor.plugin") version "3.0.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
 }
 
 group = "textsummarizer"
-version = "0.0.4"
+version = "0.0.5"
 
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
@@ -68,10 +67,9 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 
     // testing
-    testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.0-beta-1")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
+    testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("io.mockk:mockk:${mockkVersion}")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
 }
 
 ktor {
