@@ -5,9 +5,11 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
+import org.koin.ktor.ext.inject
 import textsummarizer.services.JwtService
 
-fun Application.configureSecurity(jwtService: JwtService) {
+fun Application.configureSecurity() {
+    val jwtService: JwtService by inject()
 
     install(Authentication) {
         jwt {

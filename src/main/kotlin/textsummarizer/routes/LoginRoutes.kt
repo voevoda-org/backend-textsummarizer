@@ -7,19 +7,23 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 import textsummarizer.models.Device
 import textsummarizer.models.dto.request.RefreshTokenRequest
 import textsummarizer.models.dto.response.AuthResponse
 import textsummarizer.models.dto.response.RefreshTokenResponse
-import textsummarizer.services.JwtService
 import textsummarizer.services.DeviceService
+import textsummarizer.services.JwtService
 import java.time.LocalDateTime
 import java.util.*
 
 private val logger = LoggerFactory.getLogger("LoginRoutes")
 
-fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
+fun Route.loginRoutes() {
+    val jwtService: JwtService by inject()
+    val deviceService: DeviceService by inject()
+
     route("/auth") {
         post("/login") {
             val deviceId = call.request.headers["deviceId"]?.let { UUID.fromString(it) }
