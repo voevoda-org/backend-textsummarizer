@@ -13,7 +13,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
-import textsummarizer.models.dto.ChatGPTQueryResponse
+import textsummarizer.models.dto.ChatGPTQueryResponseDto
 import textsummarizer.services.DeviceService
 import textsummarizer.services.JwtService
 import textsummarizer.util.baseUrl
@@ -63,7 +63,7 @@ class QueryRoutesTest {
                 routing {
                     post {
                         log.info("------------------------------------------------------")
-                        call.respond(mockk<ChatGPTQueryResponse>())
+                        call.respond(mockk<ChatGPTQueryResponseDto>())
                     }
                 }
             }

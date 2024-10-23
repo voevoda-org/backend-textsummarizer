@@ -19,14 +19,14 @@ import textsummarizer.models.dto.request.ChatGptRequestDto
 import textsummarizer.models.dto.request.ChatGptRequestMessageDto
 import textsummarizer.models.dto.response.EssayResult
 import textsummarizer.models.dto.MobileQueryDto
-import textsummarizer.models.dto.ChatGPTQueryResponse
+import textsummarizer.models.dto.ChatGPTQueryResponseDto
 import textsummarizer.models.dto.ChatGPTQuery
 import textsummarizer.models.dto.QueryOutputMessageDto
 import textsummarizer.models.dto.QueryType
 import textsummarizer.models.dto.response.QuestionsResult
 import textsummarizer.models.dto.response.SummaryResult
 import textsummarizer.models.dto.response.TranslationResult
-import textsummarizer.models.mapper.QueryInputDtoMapper.toQueryInputDomainModel
+import textsummarizer.models.mapper.ChatGPTQueryResponseDtoMapper.toChatGPTResult
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
 import textsummarizer.utils.ChatGPTHttpClient.openApiClient
@@ -46,8 +46,8 @@ class ChatGptService {
             setBody(queryOutputDto)
         }
             .also { logger.debug("Received {}", it) }
-            .body<ChatGPTQueryResponse>()
-            .toQueryInputDomainModel()
+            .body<ChatGPTQueryResponseDto>()
+            .toChatGPTResult()
             .let {
                 //Json.decodeFromString<ChatGptResponse>(it.choices[0].message.content)
                 // TODO Fallback for when there is a discrepancy in the JSON
@@ -63,7 +63,7 @@ class ChatGptService {
                     .toText()
             }
             .also { chatGptResponse ->
-                save(
+                saveQueryResultToDB(
                     queryText = mobileQueryDto.queryText,
                     response = chatGptResponse,
                     deviceId = deviceId
@@ -72,7 +72,7 @@ class ChatGptService {
             }
     }
 
-    private fun save(queryText: String, response: String, deviceId: UUID) {
+    private fun saveQueryResultToDB(queryText: String, response: String, deviceId: UUID) {
         Query {
             this.query = queryText
             this.response = response
