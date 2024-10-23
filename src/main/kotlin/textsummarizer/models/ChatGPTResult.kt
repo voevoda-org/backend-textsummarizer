@@ -1,5 +1,8 @@
 package textsummarizer.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ChatGPTResult(
     val id: String,
     val obj: String,
@@ -10,6 +13,7 @@ data class ChatGPTResult(
     val systemFingerprint: String? = null,
 )
 
+@Serializable
 data class ChatGPTResultChoice(
     val index: Int,
     val message: ChatGPTResultMessage,
@@ -17,11 +21,13 @@ data class ChatGPTResultChoice(
     val finishReason: String,
 )
 
+@Serializable
 data class ChatGPTResultMessage(
     val role: String,
     val content: String,
 )
 
+@Serializable
 data class ChatGPTResultUsage(
     val promptTokens: Int,
     val completionTokens: Int,

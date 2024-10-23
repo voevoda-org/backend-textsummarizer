@@ -3,7 +3,7 @@ package textsummarizer.models.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class MobileQueryDto(
+data class ChatGPTRequestFromMobileDto(
     val queryText: String,
     val queryType: QueryType
 )

@@ -12,17 +12,18 @@ import org.ktorm.entity.add
 import org.ktorm.entity.find
 import org.slf4j.LoggerFactory
 import textsummarizer.models.ChatGPTQueryType
+import textsummarizer.models.ChatGPTResult
 import textsummarizer.models.Queries
 import textsummarizer.models.Query
 import textsummarizer.models.devices
+import textsummarizer.models.dto.ChatGPTQueryDto
+import textsummarizer.models.dto.ChatGPTQueryOutputMessageDto
+import textsummarizer.models.dto.ChatGPTQueryResponseDto
+import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
+import textsummarizer.models.dto.QueryType
 import textsummarizer.models.dto.request.ChatGptRequestDto
 import textsummarizer.models.dto.request.ChatGptRequestMessageDto
 import textsummarizer.models.dto.response.EssayResult
-import textsummarizer.models.dto.MobileQueryDto
-import textsummarizer.models.dto.ChatGPTQueryResponseDto
-import textsummarizer.models.dto.ChatGPTQuery
-import textsummarizer.models.dto.QueryOutputMessageDto
-import textsummarizer.models.dto.QueryType
 import textsummarizer.models.dto.response.QuestionsResult
 import textsummarizer.models.dto.response.SummaryResult
 import textsummarizer.models.dto.response.TranslationResult
@@ -39,37 +40,45 @@ class ChatGptService {
 
     private val logger = LoggerFactory.getLogger("ChatGptService")
 
-    suspend fun query(mobileQueryDto: MobileQueryDto, deviceId: UUID): String {
-        val queryOutputDto = mobileQueryDto.createQueryContent().toQueryOutputDto()
-        logger.info("Calling OpenApi with: ${mobileQueryDto.queryText}")
+    suspend fun query(chatGPTRequestFromMobileDto: ChatGPTRequestFromMobileDto, deviceId: UUID): String {
+        val chatGPTQueryDto = chatGPTRequestFromMobileDto.defineChatGPTQueryType().toChatGPTQuery()
+        logger.info("Calling OpenApi with: ${chatGPTRequestFromMobileDto.queryText}")
+
         return openApiClient.post(queryUrl) {
-            setBody(queryOutputDto)
+            setBody(chatGPTQueryDto)
         }
             .also { logger.debug("Received {}", it) }
             .body<ChatGPTQueryResponseDto>()
             .toChatGPTResult()
-            .let {
-                //Json.decodeFromString<ChatGptResponse>(it.choices[0].message.content)
-                // TODO Fallback for when there is a discrepancy in the JSON
-                when (mobileQueryDto.queryType) {
-                    QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), it.choices[0].message.content)
-                    QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), it.choices[0].message.content)
-                    QueryType.QUESTION -> decodeFromString(QuestionsResult.serializer(), it.choices[0].message.content)
-                    QueryType.TRANSLATE -> decodeFromString(
-                        TranslationResult.serializer(),
-                        it.choices[0].message.content
-                    )
-                }
-                    .toText()
-            }
+            .let { handleChatGPTResult(chatGPTRequestFromMobileDto.queryType, it) }
             .also { chatGptResponse ->
                 saveQueryResultToDB(
-                    queryText = mobileQueryDto.queryText,
+                    queryText = chatGPTRequestFromMobileDto.queryText,
                     response = chatGptResponse,
                     deviceId = deviceId
                 )
-                logger.info("OpenApi response: $chatGptResponse")
             }
+            .also {
+                logger.info("OpenApi response: $it")
+            }
+    }
+
+    private fun handleChatGPTResult(
+        queryType: QueryType,
+        result: ChatGPTResult
+    ): String = try {
+        when (queryType) {
+            QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), result.choices[0].message.content)
+            QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), result.choices[0].message.content)
+            QueryType.QUESTION -> decodeFromString(QuestionsResult.serializer(), result.choices[0].message.content)
+            QueryType.TRANSLATE -> decodeFromString(
+                TranslationResult.serializer(),
+                result.choices[0].message.content
+            )
+        }.toText()
+    } catch (e: Exception) {
+        logger.error("Failed to parse message content: ${result.choices[0].message.content}", e)
+        result.choices[0].message.content
     }
 
     private fun saveQueryResultToDB(queryText: String, response: String, deviceId: UUID) {
@@ -102,7 +111,7 @@ class ChatGptService {
             ?.query
     }
 
-    private fun MobileQueryDto.createQueryContent() =
+    private fun ChatGPTRequestFromMobileDto.defineChatGPTQueryType() =
         when (this.queryType) {
             QueryType.SUMMARIZE -> ChatGPTQueryType.Summarize(this.queryText)
             QueryType.ESSAY -> ChatGPTQueryType.Essay(this.queryText)
@@ -110,15 +119,15 @@ class ChatGptService {
             QueryType.TRANSLATE -> ChatGPTQueryType.Translate(this.queryText)
         }
 
-    private fun ChatGPTQueryType.toQueryOutputDto() =
-        ChatGPTQuery(
+    private fun ChatGPTQueryType.toChatGPTQuery() =
+        ChatGPTQueryDto(
             model = "gpt-3.5-turbo",
             messages = listOf(
-                QueryOutputMessageDto(
+                ChatGPTQueryOutputMessageDto(
                     role = "system",
                     content = this.systemPrompt
                 ),
-                QueryOutputMessageDto(
+                ChatGPTQueryOutputMessageDto(
                     role = "user",
                     content = this.queryPrompt
                 ),

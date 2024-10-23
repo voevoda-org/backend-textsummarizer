@@ -6,7 +6,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
-import textsummarizer.models.dto.MobileQueryDto
+import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
 import textsummarizer.services.ChatGptService
 import textsummarizer.services.DeviceService
 import java.util.*
@@ -26,10 +26,10 @@ fun Route.queryRoutes() {
                 return@post call.respond(HttpStatusCode.BadRequest, "Device with id: $deviceId is not registered.")
             }
 
-            val mobileQueryDto = call.receive<MobileQueryDto>()
-            logger.info("Received $mobileQueryDto")
+            val chatGPTRequestFromMobileDto = call.receive<ChatGPTRequestFromMobileDto>()
+            logger.info("Received $chatGPTRequestFromMobileDto")
 
-            call.respond(chatGptService.query(mobileQueryDto, deviceId))
+            call.respond(chatGptService.query(chatGPTRequestFromMobileDto, deviceId))
         }
 
         route("/{id}") {

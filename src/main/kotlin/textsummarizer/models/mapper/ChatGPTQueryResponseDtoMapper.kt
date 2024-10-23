@@ -1,7 +1,7 @@
 package textsummarizer.models.mapper
 
-import textsummarizer.models.ChatGPTResultChoice
 import textsummarizer.models.ChatGPTResult
+import textsummarizer.models.ChatGPTResultChoice
 import textsummarizer.models.ChatGPTResultMessage
 import textsummarizer.models.ChatGPTResultUsage
 import textsummarizer.models.dto.ChatGPTQueryResponseDto
