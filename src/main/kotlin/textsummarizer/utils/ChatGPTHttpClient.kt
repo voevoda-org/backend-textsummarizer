@@ -32,8 +32,10 @@ object ChatGPTHttpClient {
                 val clientException = exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
                 val exceptionResponse = clientException.response
                 if (exceptionResponse.status == HttpStatusCode.Unauthorized) {
+                    logger.error("Unauthorized request to ChatGPT API")
                     throw ChatGPTApiAuthorizationException(exception.response.status)
                 } else {
+                    logger.error("ChatGPT API returned an error")
                     throw ChatGPTGenericErrorException(exception.response.status)
                 }
             }
@@ -48,10 +50,10 @@ object ChatGPTHttpClient {
         install(HttpSend) {
             maxSendCount = 50
         }
-        
+
         defaultRequest {
             header(HttpHeaders.Authorization, "Bearer $chatGptAuthKey")
-            header("Content-Type","application/json")
+            header("Content-Type", "application/json")
         }
     }
 }

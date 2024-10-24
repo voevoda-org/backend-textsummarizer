@@ -1,19 +1,26 @@
 package textsummarizer.routes
 
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.server.application.log
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.install
 import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
-import io.mockk.mockk
 import textsummarizer.models.dto.ChatGPTQueryResponseDto
+import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
+import textsummarizer.models.dto.ChatGPTResponseChoiceDto
+import textsummarizer.models.dto.ChatGPTResponseMessageDto
+import textsummarizer.models.dto.ChatGPTResponseUsageDto
+import textsummarizer.models.dto.QueryType
 import textsummarizer.module
 import textsummarizer.services.DeviceService
 import textsummarizer.services.JwtService
@@ -48,7 +55,7 @@ class QueryRoutesTest {
             module()
         }
         val url = "$baseUrl/queries"
-        val randomDeviceId= UUID.randomUUID().toString()
+        val randomDeviceId = UUID.randomUUID().toString()
         val response = client.post(url) {
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $accessToken")
@@ -61,6 +68,7 @@ class QueryRoutesTest {
 
 
     // Doesn't work :(
+    // Most likely it's the openApiClient.post that's causing the issue
     fun `Queries should return a result for happyPath`() = testApplication {
         application {
             module()
@@ -69,29 +77,51 @@ class QueryRoutesTest {
             config = MapApplicationConfig()
         }
         externalServices {
-            hosts("https://api.openai.com/v1/chat/completions") {
+            hosts("https://api.openai.com") {
+                this@hosts.install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    json()
+                }
                 routing {
-                    post {
-                        log.info("------------------------------------------------------")
-                        call.respond(mockk<ChatGPTQueryResponseDto>())
+                    post("/v1/chat/completions") {
+                        call.respond(
+                            ChatGPTQueryResponseDto(
+                                id = "chatcmpl-ALuWQEmY63gHyd1iBbZkweFUVpc9v",
+                                obj = "chat.completion",
+                                created = 1729785522,
+                                model = "gpt-3.5-turbo-0125",
+                                choices = listOf(
+                                    ChatGPTResponseChoiceDto(
+                                        index = 0,
+                                        chatGPTResponseMessageDto = ChatGPTResponseMessageDto(
+                                            role = "assistant",
+                                            content = "{\n    \"title\": \"Overview of the United States of America\",\n    \"summary\": \"The USA is a powerful and diverse country located in North America, known for its strong economy, democratic system of government, diverse population, and promotion of individual freedoms. It has the largest economy globally, driven by industries like technology and finance, and is a leader in innovation and research. The country plays a crucial role in international affairs, shaping global events and policies. Overall, the USA's history, culture, and values have a significant impact on both its society and the world.\"\n}"
+                                        ),
+                                        logProbs = null,
+                                        finishReason = "stop"
+                                    )
+                                ),
+                                chatGPTResponseUsageDto = ChatGPTResponseUsageDto(
+                                    promptTokens = 322,
+                                    completionTokens = 116,
+                                    totalTokens = 438
+                                ),
+                                systemFingerprint = null
+                            )
+                        )
                     }
                 }
             }
         }
         val url = "$baseUrl/queries"
-//        val response = client.config {
-//            install(ContentNegotiation) {
-//                json()
-//            }
-//        }
-//        val response = httpClient().post(url) {
-        val response = client.post(url){
+        val response = createClient {
+            install(ContentNegotiation) {
+                json()
+            }
+        }.post(url) {
             contentType(ContentType.Application.Json)
             header("Authorization", "Bearer $accessToken")
             header("deviceId", defaultDeviceId)
-            //setBody(encodeToJsonElement(MobileQueryDto.serializer("Ceci est un test. Veuillez l'ignorer.", QueryType.SUMMARIZE))
-            //setBody(encodeToJsonElement(MobileQueryDto.serializer(), MobileQueryDto("Ceci est un test. Veuillez l'ignorer.", QueryType.SUMMARIZE)))
-            //setBody(MobileQueryDto("Ceci est un test. Veuillez l'ignorer.", QueryType.SUMMARIZE))
+            setBody(ChatGPTRequestFromMobileDto("Ceci est un test. Veuillez l'ignorer.", QueryType.SUMMARIZE))
         }
 
         expect(HttpStatusCode.OK) { response.status }

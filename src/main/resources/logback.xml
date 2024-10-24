@@ -3,10 +3,21 @@
         <encoder>
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
+
+        <!-- Custom filter to exclude GET logs containing "/metrics" -->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.GEventEvaluator">
+                <expression>return !message.contains("GET /metrics");</expression>
+            </evaluator>
+            <OnMismatch>NEUTRAL</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+        </filter>
     </appender>
     <root level="trace">
         <appender-ref ref="STDOUT"/>
     </root>
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="io.ktor.server.routing.Routing" level="INFO"/>
+    <logger name="io.ktor.server.plugins.contentnegotiation.ContentNegotiation" level="INFO"/>
 </configuration>

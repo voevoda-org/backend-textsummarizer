@@ -39,3 +39,7 @@ out/
 docker-compose.yml
 docker-compose.prod.yml
 monitoring/grafana
+/docs/.swagger-codegen-ignore
+/GrafanaDashboard.json
+/docs/index.html
+/docs/.swagger-codegen/VERSION

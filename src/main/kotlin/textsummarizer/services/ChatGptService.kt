@@ -3,6 +3,7 @@ package textsummarizer.services
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.server.plugins.NotFoundException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -45,7 +46,7 @@ class ChatGptService {
         return openApiClient.post(queryUrl) {
             setBody(chatGPTQueryDto)
         }
-            .also { logger.debug("Received {}", it) }
+            .also {logger.debug("Received {}", it.bodyAsText()) }
             .body<ChatGPTQueryResponseDto>()
             .extractContentAsJSONString()
             .also { logger.debug("Extracted content: $it") }
