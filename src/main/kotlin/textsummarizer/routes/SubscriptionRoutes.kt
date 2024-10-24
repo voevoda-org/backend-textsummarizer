@@ -5,15 +5,14 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
-import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 import textsummarizer.services.DeviceService
 import java.util.*
 
 private val logger = LoggerFactory.getLogger("SubscriptionRoutes")
 
-fun Route.subscriptionRoutes() {
-    val deviceService: DeviceService by inject()
+fun Route.subscriptionRoutes(deviceService: DeviceService) {
+    //val deviceService: DeviceService by inject()
 
     route("/subscription") {
         get {

@@ -7,7 +7,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import org.koin.ktor.ext.inject
+
 import org.slf4j.LoggerFactory
 import textsummarizer.models.Device
 import textsummarizer.models.dto.request.RefreshTokenRequest
@@ -20,9 +20,9 @@ import java.util.*
 
 private val logger = LoggerFactory.getLogger("LoginRoutes")
 
-fun Route.loginRoutes() {
-    val jwtService: JwtService by inject()
-    val deviceService: DeviceService by inject()
+fun Route.loginRoutes(jwtService: JwtService, deviceService: DeviceService) {
+    //val jwtService: JwtService by inject()
+    //val deviceService: DeviceService by inject()
 
     route("/auth") {
         post("/login") {

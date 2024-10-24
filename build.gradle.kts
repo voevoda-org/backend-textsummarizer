@@ -68,7 +68,7 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql:$flywayVersion")
 
     // koin
-    implementation("io.insert-koin:koin-ktor:$koinVersion")
+    //implementation("io.insert-koin:koin-ktor:$koinVersion")
 
     // testing
     testImplementation("io.ktor:ktor-server-test-host-jvm")

@@ -14,6 +14,7 @@ import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import textsummarizer.models.dto.ChatGPTQueryResponseDto
+import textsummarizer.module
 import textsummarizer.services.DeviceService
 import textsummarizer.services.JwtService
 import textsummarizer.util.baseUrl
@@ -28,6 +29,9 @@ class QueryRoutesTest {
 
     @Test
     fun `Queries should return Bad Request when no deviceId header is present`() = testApplication {
+        application {
+            module()
+        }
         val url = "$baseUrl/queries"
         val response = client.post(url) {
             contentType(ContentType.Application.Json)
@@ -40,6 +44,9 @@ class QueryRoutesTest {
 
     @Test
     fun `Queries should return Bad Request when deviceId does not exist in database`() = testApplication {
+        application {
+            module()
+        }
         val url = "$baseUrl/queries"
         val randomDeviceId= UUID.randomUUID().toString()
         val response = client.post(url) {
@@ -55,6 +62,9 @@ class QueryRoutesTest {
 
     // Doesn't work :(
     fun `Queries should return a result for happyPath`() = testApplication {
+        application {
+            module()
+        }
         environment {
             config = MapApplicationConfig()
         }

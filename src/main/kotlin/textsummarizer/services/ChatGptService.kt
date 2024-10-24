@@ -12,7 +12,6 @@ import org.ktorm.entity.add
 import org.ktorm.entity.find
 import org.slf4j.LoggerFactory
 import textsummarizer.models.ChatGPTQueryType
-import textsummarizer.models.ChatGPTResult
 import textsummarizer.models.Queries
 import textsummarizer.models.Query
 import textsummarizer.models.devices
@@ -27,7 +26,6 @@ import textsummarizer.models.dto.response.EssayResult
 import textsummarizer.models.dto.response.QuestionsResult
 import textsummarizer.models.dto.response.SummaryResult
 import textsummarizer.models.dto.response.TranslationResult
-import textsummarizer.models.mapper.ChatGPTQueryResponseDtoMapper.toChatGPTResult
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
 import textsummarizer.utils.ChatGPTHttpClient.openApiClient
@@ -49,8 +47,14 @@ class ChatGptService {
         }
             .also { logger.debug("Received {}", it) }
             .body<ChatGPTQueryResponseDto>()
-            .toChatGPTResult()
-            .let { handleChatGPTResult(chatGPTRequestFromMobileDto.queryType, it) }
+            .extractContentAsJSONString()
+            .also { logger.debug("Extracted content: $it") }
+            .let {
+                handleChatGPTResponse(
+                    queryType = chatGPTRequestFromMobileDto.queryType,
+                    chatGPTResponseContent = it
+                )
+            }
             .also { chatGptResponse ->
                 saveQueryResultToDB(
                     queryText = chatGPTRequestFromMobileDto.queryText,
@@ -63,22 +67,19 @@ class ChatGptService {
             }
     }
 
-    private fun handleChatGPTResult(
+    private fun handleChatGPTResponse(
         queryType: QueryType,
-        result: ChatGPTResult
+        chatGPTResponseContent: String
     ): String = try {
         when (queryType) {
-            QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), result.choices[0].message.content)
-            QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), result.choices[0].message.content)
-            QueryType.QUESTION -> decodeFromString(QuestionsResult.serializer(), result.choices[0].message.content)
-            QueryType.TRANSLATE -> decodeFromString(
-                TranslationResult.serializer(),
-                result.choices[0].message.content
-            )
+            QueryType.SUMMARIZE -> decodeFromString(SummaryResult.serializer(), chatGPTResponseContent)
+            QueryType.ESSAY -> decodeFromString(EssayResult.serializer(), chatGPTResponseContent)
+            QueryType.QUESTION -> decodeFromString(QuestionsResult.serializer(), chatGPTResponseContent)
+            QueryType.TRANSLATE -> decodeFromString(TranslationResult.serializer(), chatGPTResponseContent)
         }.toText()
     } catch (e: Exception) {
-        logger.error("Failed to parse message content: ${result.choices[0].message.content}", e)
-        result.choices[0].message.content
+        logger.error("Failed to parse message content: $chatGPTResponseContent", e)
+        chatGPTResponseContent
     }
 
     private fun saveQueryResultToDB(queryText: String, response: String, deviceId: UUID) {
@@ -134,6 +135,8 @@ class ChatGptService {
             ),
             temperature = 0.7f
         )
+
+    fun ChatGPTQueryResponseDto.extractContentAsJSONString() = choices.first().chatGPTResponseMessageDto.content
 }
 
 // TESTING

@@ -4,7 +4,6 @@ import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.koin.ktor.ext.inject
 import org.slf4j.LoggerFactory
 import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
 import textsummarizer.services.ChatGptService
@@ -13,9 +12,9 @@ import java.util.*
 
 private val logger = LoggerFactory.getLogger("QueryRoutes")
 
-fun Route.queryRoutes() {
-    val deviceService: DeviceService by inject()
-    val chatGptService: ChatGptService by inject()
+fun Route.queryRoutes(deviceService: DeviceService, chatGptService: ChatGptService) {
+    //val deviceService: DeviceService by inject()
+    //val chatGptService: ChatGptService by inject()
 
     route("/queries") {
         post {

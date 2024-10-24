@@ -5,14 +5,17 @@ import io.ktor.client.request.header
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
+import textsummarizer.module
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.expect
 
 class SubscriptionRoutesKtTest {
-
     @Test
     fun `testGetApiV1Subscription should fail, when no deviceId is present`() = testApplication {
+        application {
+            module()
+        }
         client.get("/api/v1/subscription").apply {
             expect(HttpStatusCode.BadRequest) { this.status }
             expect("Missing deviceId header.") { this.bodyAsText() }
@@ -31,6 +34,9 @@ class SubscriptionRoutesKtTest {
 
     @Test
     fun `testGetApiV1Subscription should fail, when deviceId does not exist in db`() = testApplication {
+        application {
+            module()
+        }
         val randomDeviceId= UUID.randomUUID().toString()
         client.get("/api/v1/subscription"){
             header("deviceId", randomDeviceId)
