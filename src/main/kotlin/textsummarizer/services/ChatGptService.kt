@@ -124,7 +124,7 @@ class ChatGptService {
     private fun ChatGPTQueryType.toChatGPTQuery() =
         ChatGPTQueryDto(
             //model = "gpt-3.5-turbo",
-            model = "gpt-40-mini",
+            model = "gpt-4o-mini",
             messages = listOf(
                 ChatGPTQueryOutputMessageDto(
                     role = "system",
