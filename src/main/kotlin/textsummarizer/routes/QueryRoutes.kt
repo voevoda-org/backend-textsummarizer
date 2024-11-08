@@ -5,7 +5,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.slf4j.LoggerFactory
-import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
+import textsummarizer.models.dto.chatGPT.request.ChatGPTRequestFromMobileDto
 import textsummarizer.services.ChatGptService
 import textsummarizer.services.DeviceService
 import java.util.*

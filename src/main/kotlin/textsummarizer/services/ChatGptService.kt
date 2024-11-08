@@ -16,17 +16,15 @@ import textsummarizer.models.ChatGPTQueryType
 import textsummarizer.models.Queries
 import textsummarizer.models.Query
 import textsummarizer.models.devices
-import textsummarizer.models.dto.ChatGPTQueryDto
-import textsummarizer.models.dto.ChatGPTQueryOutputMessageDto
-import textsummarizer.models.dto.ChatGPTQueryResponseDto
-import textsummarizer.models.dto.ChatGPTRequestFromMobileDto
-import textsummarizer.models.dto.QueryType
-import textsummarizer.models.dto.request.ChatGptRequestDto
-import textsummarizer.models.dto.request.ChatGptRequestMessageDto
-import textsummarizer.models.dto.response.EssayResult
-import textsummarizer.models.dto.response.QuestionsResult
-import textsummarizer.models.dto.response.SummaryResult
-import textsummarizer.models.dto.response.TranslationResult
+import textsummarizer.models.dto.chatGPT.request.ChatGPTQueryOutputMessageDto
+import textsummarizer.models.dto.chatGPT.request.ChatGPTQueryRequest
+import textsummarizer.models.dto.chatGPT.request.ChatGPTRequestFromMobileDto
+import textsummarizer.models.dto.chatGPT.request.QueryType
+import textsummarizer.models.dto.chatGPT.response.ChatGPTQueryResponseDto
+import textsummarizer.models.dto.chatGPT.response.EssayResult
+import textsummarizer.models.dto.chatGPT.response.QuestionsResult
+import textsummarizer.models.dto.chatGPT.response.SummaryResult
+import textsummarizer.models.dto.chatGPT.response.TranslationResult
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
 import textsummarizer.utils.ChatGPTHttpClient.openApiClient
@@ -122,7 +120,7 @@ class ChatGptService {
         }
 
     private fun ChatGPTQueryType.toChatGPTQuery() =
-        ChatGPTQueryDto(
+        ChatGPTQueryRequest(
             //model = "gpt-3.5-turbo",
             model = "gpt-4o-mini",
             messages = listOf(
@@ -142,19 +140,19 @@ class ChatGptService {
 }
 
 // TESTING
-private fun String.toQueryDto(): ChatGptRequestDto {
-    return ChatGptRequestDto(
+private fun String.toQueryDto(): ChatGPTQueryRequest {
+    return ChatGPTQueryRequest(
         model = "gpt-3.5-turbo",
         messages = listOf(
-            ChatGptRequestMessageDto(
+            ChatGPTQueryOutputMessageDto(
                 role = "system",
                 content = "You are a text summarizer"
             ),
-            ChatGptRequestMessageDto(
+            ChatGPTQueryOutputMessageDto(
                 role = "user",
                 content = "Give me a summary of the following text in 20 words or less:"
             ),
-            ChatGptRequestMessageDto(
+            ChatGPTQueryOutputMessageDto(
                 role = "user",
                 content = this
             )

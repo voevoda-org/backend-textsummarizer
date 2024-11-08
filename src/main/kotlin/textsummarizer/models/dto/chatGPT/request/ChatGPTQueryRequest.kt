@@ -1,10 +1,10 @@
-package textsummarizer.models.dto
+package textsummarizer.models.dto.chatGPT.request
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatGPTQueryDto(
+data class ChatGPTQueryRequest(
     @SerialName("model") val model: String,
     @SerialName("messages") val messages: List<ChatGPTQueryOutputMessageDto>,
     @SerialName("temperature") val temperature: Float,

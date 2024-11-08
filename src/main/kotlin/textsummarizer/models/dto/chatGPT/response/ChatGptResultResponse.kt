@@ -1,4 +1,4 @@
-package textsummarizer.models.dto.response
+package textsummarizer.models.dto.chatGPT.response
 
 import kotlinx.serialization.Serializable
 
