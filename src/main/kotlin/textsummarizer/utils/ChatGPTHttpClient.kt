@@ -25,7 +25,7 @@ object ChatGPTHttpClient {
     private val config = HoconApplicationConfig(ConfigFactory.load())
 
     private val chatGptAuthKey = config.property("chatGpt.authKey").getString()
-    val openApiClient: HttpClient = HttpClient(CIO) {
+    val chatGptApiClient: HttpClient = HttpClient(CIO) {
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, request ->
                 logger.debug(exception.toString())

@@ -27,7 +27,7 @@ import textsummarizer.models.dto.chatGPT.response.SummaryResult
 import textsummarizer.models.dto.chatGPT.response.TranslationResult
 import textsummarizer.models.queries
 import textsummarizer.plugins.DatabaseFactory.db
-import textsummarizer.utils.ChatGPTHttpClient.openApiClient
+import textsummarizer.utils.ChatGPTHttpClient.chatGptApiClient
 import java.time.LocalDateTime
 import java.util.*
 
@@ -38,13 +38,15 @@ class ChatGptService {
     private val logger = LoggerFactory.getLogger("ChatGptService")
 
     suspend fun query(chatGPTRequestFromMobileDto: ChatGPTRequestFromMobileDto, deviceId: UUID): String {
-        val chatGPTQueryDto = chatGPTRequestFromMobileDto.defineChatGPTQueryType().toChatGPTQuery()
+        val chatGPTQueryDto = chatGPTRequestFromMobileDto
+            .defineChatGPTQueryType()
+            .toChatGPTQuery()
         logger.info("Calling OpenApi with: ${chatGPTRequestFromMobileDto.queryText}")
 
-        return openApiClient.post(queryUrl) {
+        return chatGptApiClient.post(queryUrl) {
             setBody(chatGPTQueryDto)
         }
-            .also {logger.debug("Received {}", it.bodyAsText()) }
+            .also { logger.debug("Received {}", it.bodyAsText()) }
             .body<ChatGPTQueryResponseDto>()
             .extractContentAsJSONString()
             .also { logger.debug("Extracted content: $it") }
