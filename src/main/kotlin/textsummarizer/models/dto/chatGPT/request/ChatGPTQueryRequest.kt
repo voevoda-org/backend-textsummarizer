@@ -8,8 +8,8 @@ data class ChatGPTQueryRequest(
     @SerialName("model") val model: String,
     @SerialName("messages") val messages: List<ChatGPTQueryOutputMessageDto>,
     @SerialName("temperature") val temperature: Float,
-    @SerialName("response_format")
-    val responseFormat: ChatGPTQueryOutputResponseFormatDto = ChatGPTQueryOutputResponseFormatDto(),
+    @SerialName("response_format") val responseFormat: ChatGPTQueryOutputResponseFormatDto = ChatGPTQueryOutputResponseFormatDto(),
+    @SerialName("stream") val stream: Boolean = true,
 )
 
 @Serializable

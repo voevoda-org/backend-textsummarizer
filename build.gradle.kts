@@ -70,6 +70,9 @@ dependencies {
     // koin
     //implementation("io.insert-koin:koin-ktor:$koinVersion")
 
+    // openai
+    implementation("com.aallam.openai:openai-client:4.0.0-beta01")
+
     // testing
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("io.mockk:mockk:${mockkVersion}")
